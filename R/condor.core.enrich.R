@@ -4,8 +4,8 @@
 #' has a stochastically larger qscore distribution.
 #' @param test_nodes is a list containing the subset of nodes (of one node class
 #' --blue or red--only) to be tested
-#' @param q is a two column data frame containing the node names in the 
-#' first column and the q-scores in the second column.
+#' @param q is a three column data frame containing the node names in the 
+#' first column and the q-scores in the third column.
 #' @param perm if TRUE, run permutation tests. Else, run 
 #' \code{\link[stats]{ks.test}} and \code{\link[stats]{wilcox.test}} only.
 #' @param plot.hist if TRUE, produces two histograms of test statistics 
@@ -35,12 +35,12 @@
 condor.core.enrich = function(test_nodes,q,perm=FALSE,plot.hist=FALSE,nsamp=1000){
     qtest <- q[q[,1] %in% test_nodes,2]
     #
-    qall <- q[,2]
+    qall <- q[,3]
     ks_out <- ks.test(qtest,qall,exact=FALSE,alternative="less")
     
     w_out <- wilcox.test(qtest,qall,exact=FALSE,alternative="greater")
     if(perm){
-        qnull <- q[!(q[,1] %in% test_nodes),2]
+        qnull <- q[!(q[,1] %in% test_nodes),3]
         ks_true <- ks.test(qtest,qnull,exact=FALSE,alternative="less")$statistic
         ks_rand <- ks.permute(qtest,qnull,nsamp=nsamp)
         pv_permuted <- perm.pval(ks_true,ks_rand)

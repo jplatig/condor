@@ -11,8 +11,8 @@ condor.core.enrich(test_nodes, q, perm = FALSE, plot.hist = FALSE,
 \item{test_nodes}{is a list containing the subset of nodes (of one node class
 --blue or red--only) to be tested}
 
-\item{q}{is a two column data frame containing the node names in the
-first column and the q-scores in the second column.}
+\item{q}{is a three column data frame containing the node names in the
+first column and the q-scores in the third column.}
 
 \item{perm}{if TRUE, run permutation tests. Else, run
 \code{\link[stats]{ks.test}} and \code{\link[stats]{wilcox.test}} only.}

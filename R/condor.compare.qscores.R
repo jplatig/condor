@@ -18,7 +18,7 @@ condor.compare.qscores <- function(x, y, z, lab.x="Condition 1", lab.y="Conditio
   stable.genes <- c()
   for (i in 1:nrow(r)) {
     stable.x <- subset(x, com==i)$names
-    stable.y <- subset(y, com==com.map[i])$names
+    stable.y <- subset(y, com%in%com.map[[i]])$names
     stable.genes <- c(stable.genes, intersect(stable.x, stable.y))
   }
   qscore$stable <- with(qscore, names %in% stable.genes)
@@ -27,8 +27,8 @@ condor.compare.qscores <- function(x, y, z, lab.x="Condition 1", lab.y="Conditio
   x.p <- wilcox.test(value ~ stable, data=subset(d, variable=="Q.x"))$p.value
   y.p <- wilcox.test(value ~ stable, data=subset(d, variable=="Q.y"))$p.value
   
-  x.ks <- ks.test(subset(qscore, stable==T)$Q.x, subset(qscore, stable==F)$Q.x, alternative="greater")$p.value
-  y.ks <- ks.test(subset(qscore, stable==T)$Q.y, subset(qscore, stable==F)$Q.y, alternative="greater")$p.value
+  x.ks <- ks.test(subset(qscore, stable==T)$Q.x, subset(qscore, stable==F)$Q.x, alternative="less")$p.value
+  y.ks <- ks.test(subset(qscore, stable==T)$Q.y, subset(qscore, stable==F)$Q.y, alternative="less")$p.value
   
   df <- data.frame(variable=c("Q.x", "Q.y"), p=c(x.p, y.p), ks=c(x.ks, y.ks))
   d <- merge(d, df, by="variable")
@@ -43,5 +43,5 @@ condor.compare.qscores <- function(x, y, z, lab.x="Condition 1", lab.y="Conditio
     scale_x_discrete(labels=c(lab.x, lab.y)) +
     xlab("condition") + ylab("core score") +
     ggtitle("Core score distributions by condition and stability") +
-    geom_text(data=d[c(1, nrow(d)),], y=max(d$value))
+    geom_text(data=d[c(1, nrow(d)),], y=max(d$value), vjust=1)
 }

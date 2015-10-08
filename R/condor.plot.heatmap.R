@@ -35,7 +35,7 @@ condor.plot.heatmap = function(condor.object, main="", xlab="blues", ylab="reds"
   heatmap.2(adj, Rowv=FALSE, Colv=FALSE, dendrogram="none", keysize=1.25,
             col=colorpanel(10, "white", "black"), scale="none",
             key=TRUE, symkey=FALSE, density.info="none", trace="none",
-            main=main, sepcol="#DDDDDD", colsep=colsep, rowsep=rowsep,
+            main=main, sepcol="#EEEEEE", colsep=colsep, rowsep=rowsep,
             sepwidth = c(0.025, 0.025), ylab=ylab, xlab=xlab, margins=c(3,3),
             labCol=labCol, labRow=labRow, offsetRow=0, offsetCol=0,
             breaks=sort(c(0.1,seq(0, max(adj),length.out=10))))

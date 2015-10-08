@@ -28,8 +28,8 @@ condor.qscore = function(condor.object){
         stop("Community Memberships missing. Run condor.cluster or condor.modularity.max first!")
         }
     bo <- condor.object
-    bo$blue.memb <- bo$blue.memb[order(bo$blue.memb[,"blue.names"]),]
-    bo$red.memb <- bo$red.memb[order(bo$red.memb[,"red.names"]),]
+    bo$blue.memb <- bo$blue.memb[order(bo$blue.memb[,"names"]),]
+    bo$red.memb <- bo$red.memb[order(bo$red.memb[,"names"]),]
     bo$Qcoms <- bo$Qcoms[order(bo$Qcoms[,"community"]),]
     condor.object <- bo
     
@@ -75,6 +75,6 @@ condor.qscore = function(condor.object){
         Bi = A[i,] - (ki[i]*dj)/m;
         Qik[i] = ((Bi %*% T2[,r1[i,2]])/(2*m))*(1/Qcoms[r1[i,2],1])  
     }    
-    condor.object$qscores = list(blue.qscore=data.frame(T1,Qjk),red.qscore=data.frame(R1,Qik))
+    condor.object$qscores = list(blue.qscore=data.frame(T1,Q=Qjk),red.qscore=data.frame(R1,Q=Qik))
     return(condor.object)
 }

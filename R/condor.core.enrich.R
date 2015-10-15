@@ -33,7 +33,7 @@
 #' @export
 #' 
 condor.core.enrich = function(test_nodes,q,perm=FALSE,plot.hist=FALSE,nsamp=1000){
-    qtest <- q[q[,1] %in% test_nodes,2]
+    qtest <- q[q[,1] %in% test_nodes,3]
     #
     qall <- q[,3]
     ks_out <- ks.test(qtest,qall,exact=FALSE,alternative="less")

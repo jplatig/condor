@@ -17,6 +17,8 @@ condor.compare.qscores(x, y, z, lab.x = "Condition 1",
 \item{lab.x}{Label of first condition}
 
 \item{lab.y}{Label of second condition}
+
+\item{nsamp}{Number of permutation tests to run, passed to \code{\link{condor.core.enrich}}}
 }
 \value{
 ggplot object

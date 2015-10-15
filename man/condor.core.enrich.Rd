@@ -8,7 +8,7 @@ condor.core.enrich(test_nodes, q, perm = FALSE, plot.hist = FALSE,
   nsamp = 1000)
 }
 \arguments{
-\item{test_nodes}{is a list containing the subset of nodes (of one node class
+\item{test_nodes}{is a vector containing the subset of nodes (of one node class
 --blue or red--only) to be tested}
 
 \item{q}{is a three column data frame containing the node names in the

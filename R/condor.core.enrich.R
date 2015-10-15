@@ -2,7 +2,7 @@
 #' 
 #' Compute one-sided KS and wilcox tests to determine if a subset of nodes
 #' has a stochastically larger qscore distribution.
-#' @param test_nodes is a list containing the subset of nodes (of one node class
+#' @param test_nodes is a vector containing the subset of nodes (of one node class
 #' --blue or red--only) to be tested
 #' @param q is a three column data frame containing the node names in the 
 #' first column and the q-scores in the third column.
@@ -34,7 +34,6 @@
 #' 
 condor.core.enrich = function(test_nodes,q,perm=FALSE,plot.hist=FALSE,nsamp=1000){
     qtest <- q[q[,1] %in% test_nodes,3]
-    #
     qall <- q[,3]
     ks_out <- ks.test(qtest,qall,exact=FALSE,alternative="less")
     

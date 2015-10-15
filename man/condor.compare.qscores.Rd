@@ -5,7 +5,7 @@
 \title{Plots boxplots of core score distributions by condition and by stability}
 \usage{
 condor.compare.qscores(x, y, z, lab.x = "Condition 1",
-  lab.y = "Condition 2")
+  lab.y = "Condition 2", nsamp = 1000)
 }
 \arguments{
 \item{x}{First condor.object qscores data.frame}

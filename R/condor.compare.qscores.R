@@ -37,7 +37,8 @@ condor.compare.qscores <- function(x, y, z, lab.x="Condition 1", lab.y="Conditio
   d$ks <- paste("KS p:", format(d$ks, scientific=T, digits=2))
   d$p <- paste(d$p, d$ks, sep='\n')
   
-  ggplot(d, aes(variable, value, fill=stable, label=p)) + geom_boxplot() +
+  ggplot(d, aes(variable, value, fill=stable, label=p)) +
+    geom_boxplot(notch=TRUE) +
     scale_fill_discrete(guide=guide_legend(title=NULL),
                         labels=c("variable", "stable")) +
     scale_x_discrete(labels=c(lab.x, lab.y)) +

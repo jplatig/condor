@@ -5,7 +5,7 @@
 \title{Plots overlap between communities for two condor objects with identical nodes}
 \usage{
 condor.plot.community.overlap(x, y, main = "", xlab = "Condition 1",
-  ylab = "Condition 2", reorder = TRUE)
+  ylab = "Condition 2", reorder = TRUE, scale = "none")
 }
 \arguments{
 \item{x}{First condor.object membership data.frame}
@@ -15,6 +15,8 @@ condor.plot.community.overlap(x, y, main = "", xlab = "Condition 1",
 \item{main}{Title of plot}
 
 \item{reorder}{If FALSE, do not reorder rows and columns}
+
+\item{scale}{character indicating if the values should be scaled in either the row direction or the column direction, or none. The default is \code{"none"}.}
 }
 \value{
 matrix containing overlap between each pair of communities

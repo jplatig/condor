@@ -33,7 +33,7 @@ condor.plot.heatmap = function(condor.object, main="", xlab="blues", ylab="reds"
   labRow <- as.character(sort(red.memb[,2]))
   labRow[duplicated(labRow)] <- ""
   heatmap.2(adj, Rowv=FALSE, Colv=FALSE, dendrogram="none", keysize=1.25,
-            col=colorpanel(10, "white", "black"), scale="none",
+            col=colorpanel(10, "white", "black"), 
             key=TRUE, symkey=FALSE, density.info="none", trace="none",
             main=main, sepcol="#EEEEEE", colsep=colsep, rowsep=rowsep,
             sepwidth = c(0.025, 0.025), ylab=ylab, xlab=xlab, margins=c(3,3),

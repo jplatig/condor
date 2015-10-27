@@ -4,19 +4,21 @@
 \alias{condor.plot.community.overlap}
 \title{Plots overlap between communities for two condor objects with identical nodes}
 \usage{
-condor.plot.community.overlap(x, y, main = "", xlab = "Condition 1",
-  ylab = "Condition 2", reorder = TRUE, scale = "none")
+condor.plot.community.overlap(x, y, scale.condition = c("none", "row",
+  "column"), ...)
 }
 \arguments{
-\item{x}{First condor.object membership data.frame}
+\item{x}{First condor.object membership or qscores data.frame}
 
-\item{y}{Second condor.object membership data.frame}
+\item{y}{Second condor.object membership or qscores data.frame}
 
-\item{main}{Title of plot}
-
-\item{reorder}{If FALSE, do not reorder rows and columns}
+\item{...}{other arguments passed to heatmap.2}
 
 \item{scale}{character indicating if the values should be scaled in either the row direction or the column direction, or none. The default is \code{"none"}.}
+
+\item{xlab}{x-axis label}
+
+\item{ylab}{y-axis label}
 }
 \value{
 matrix containing overlap between each pair of communities

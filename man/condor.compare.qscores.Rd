@@ -4,19 +4,17 @@
 \alias{condor.compare.qscores}
 \title{Plots boxplots of core score distributions by condition and by stability}
 \usage{
-condor.compare.qscores(x, y, z, lab.x = "Condition 1",
-  lab.y = "Condition 2", nsamp = 1000)
+condor.compare.qscores(qscore, lab.x = "Condition x", lab.y = "Condition y",
+  scale.log = FALSE, nsamp = 10000)
 }
 \arguments{
-\item{x}{First condor.object qscores data.frame}
-
-\item{y}{Second condor.object qscores data.frame}
-
-\item{z}{Output of \code{\link{condor.plot.community.overlap}}}
+\item{qscore}{Output of \code{\link{calc.qscore.stability}}}
 
 \item{lab.x}{Label of first condition}
 
 \item{lab.y}{Label of second condition}
+
+\item{scale.log}{TRUE/FALSE - If TRUE, plot log core scores}
 
 \item{nsamp}{Number of permutation tests to run, passed to \code{\link{condor.core.enrich}}}
 }

@@ -1,7 +1,7 @@
 #' Wrapper for core condor functions
 #' 
-#' Given an input edge list, this function performs community structure clustering,
-#' calculates core scores, and generates the network link heatmap.
+#' Given an input edge list, this function performs community structure clustering and
+#' calculates core scores.
 #' @param return.gcc if TRUE, returns the giant connected component
 #' @param cs.method is a string to specify which unipartite community 
 #' structure algorithm should be used for the seed clustering. 
@@ -14,7 +14,6 @@
 #' are projected and clustered using \code{cs.method}. If FALSE, the 
 #' complete bipartite network is clustered using the unipartite clustering 
 #' methods listed in \code{cs.method}.
-#' @param ... arguments passed to heatmap.2 in \code{\link{condor.plot.heatmap}}
 #' @return \code{condor.object}
 #' @examples 
 #' r = c(1,1,1,2,2,2,3,3,3,4,4);
@@ -27,10 +26,12 @@
 #' @import Matrix
 #' @export
 #' 
-condor <- function(edgelist,return.gcc=TRUE,cs.method="LCS",project=TRUE, ...){
+condor <- function(edgelist,return.gcc=TRUE,cs.method="LCS",project=TRUE){
   condor.object <- create.condor.object(edgelist, return.gcc)
+  message("Clustering bipartite network...")
   condor.object <- condor.cluster(condor.object, cs.method, project)
+  message("Computing core scores...")
   condor.object <- condor.qscore(condor.object)
-  condor.plot.heatmap(condor.object, ...)
+  message("DONE")
   return(condor.object)
 }

@@ -11,7 +11,7 @@
 #' @import Matrix
 #' @export
 #' 
-condor.plot.community.overlap <- function(x, y, scale.condition=c("none","row","column"), ...) {
+condor.plot.community.overlap <- function(x, y, xlab="Condition y", ylab="Condition x", scale.condition=c("none","row","column"), ...) {
   scale.condition <- match.arg(scale.condition)
   xs <- split(x, x$com)
   ys <- split(y, y$com)
@@ -29,8 +29,7 @@ condor.plot.community.overlap <- function(x, y, scale.condition=c("none","row","
   if (scale.condition=="column") {
     zplot <- t(t(zplot)/colSums(zplot))
   }
-  heatmap.2(zplot, trace="none", 
-            xlab="Condition y", ylab="Condition x", scale="none",
+  heatmap.2(zplot, trace="none", xlab=xlab, ylab=ylab, scale="none",
             col=colorpanel(10, "white", "black"),
             breaks=sort(c(0.1,seq(0, max(zplot),length.out=10))),
             ...)

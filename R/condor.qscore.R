@@ -64,17 +64,19 @@ condor.qscore = function(condor.object){
     T2 = sparseMatrix(i=t1[,1],j=t1[,2],x=1,dims=c(max(t1[,1]),max(t1[,2])),index1=TRUE);
     Qcoms <- condor.object$Qcoms
     Qjk = vector(length=q)
+    pb <- txtProgressBar(style=3, max=max(t1[,1])+max(r1[,1]))
     for(j in 1:max(t1[,1])){
-        if(j %% 1000 == 0){print(paste(j,t1[j,]))}
+        setTxtProgressBar(pb, j)
         Bj = A[,j] - (ki*dj[j])/m;
         Qjk[j] = ((Rtrans[t1[j,2],] %*% Bj)/(2*m))*(1/Qcoms[t1[j,2],1])
     }  
     Qik = vector(length=p)
     for(i in 1:max(r1[,1])){
-        if(i %% 1000 == 0){print(i)}
+        setTxtProgressBar(pb, max(t1[,1])+i)
         Bi = A[i,] - (ki[i]*dj)/m;
         Qik[i] = ((Bi %*% T2[,r1[i,2]])/(2*m))*(1/Qcoms[r1[i,2],1])  
-    }    
+    }
+    close(pb)
     condor.object$qscores = list(blue.qscore=data.frame(T1,Q=Qjk),red.qscore=data.frame(R1,Q=Qik))
     return(condor.object)
 }

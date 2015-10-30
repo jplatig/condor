@@ -4,8 +4,7 @@
 \alias{condor}
 \title{Wrapper for core condor functions}
 \usage{
-condor(edgelist, return.gcc = TRUE, cs.method = "LCS", project = TRUE,
-  ...)
+condor(edgelist, return.gcc = TRUE, cs.method = "LCS", project = TRUE)
 }
 \arguments{
 \item{return.gcc}{if TRUE, returns the giant connected component}
@@ -22,15 +21,13 @@ If TRUE, the nodes in the first column of \code{condor.object$edges}
 are projected and clustered using \code{cs.method}. If FALSE, the
 complete bipartite network is clustered using the unipartite clustering
 methods listed in \code{cs.method}.}
-
-\item{...}{arguments passed to heatmap.2 in \code{\link{condor.plot.heatmap}}}
 }
 \value{
 \code{condor.object}
 }
 \description{
-Given an input edge list, this function performs community structure clustering,
-calculates core scores, and generates the network link heatmap.
+Given an input edge list, this function performs community structure clustering and
+calculates core scores.
 }
 \examples{
 r = c(1,1,1,2,2,2,3,3,3,4,4);

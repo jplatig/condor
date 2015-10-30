@@ -4,11 +4,15 @@
 \alias{condor.plot.heatmap}
 \title{Plot weighted adjacency matrix with links grouped by community}
 \usage{
-condor.plot.heatmap(condor.object, ...)
+condor.plot.heatmap(condor.object, ylab = "reds", xlab = "blues", ...)
 }
 \arguments{
 \item{condor.object}{output of either \code{\link{condor.cluster}} or
 \code{\link{condor.modularity.max}}}
+
+\item{ylab}{y-axis label}
+
+\item{xlab}{x-axis label}
 
 \item{...}{other arguments passed to heatmap.2}
 }

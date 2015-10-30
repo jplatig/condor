@@ -3,6 +3,8 @@
 #' This function will generate the network link 'heatmap' for a weighted network
 #' @param condor.object output of either \code{\link{condor.cluster}} or 
 #' \code{\link{condor.modularity.max}}
+#' @param xlab x-axis label
+#' @param ylab y-axis label
 #' @param ... other arguments passed to heatmap.2
 #' @return produces a \code{\link[graphics]{plot}} output.
 #' @examples
@@ -13,7 +15,7 @@
 #' @import gplots
 #' @export
 #'  
-condor.plot.heatmap = function(condor.object, ...){
+condor.plot.heatmap = function(condor.object, ylab="reds", xlab="blues", ...){
   bo <- condor.object
   attach(bo)
   # set edges in unweighted graph to have weight of 1
@@ -38,7 +40,7 @@ condor.plot.heatmap = function(condor.object, ...){
             col=colorpanel(10, "white", "black"), 
             key=TRUE, symkey=FALSE, density.info="none", trace="none",
             sepcolor="#EEEEEE", colsep=colsep, rowsep=rowsep,
-            sepwidth = c(0.025, 0.025), ylab="reds", xlab="blues", margins=c(3,3),
+            sepwidth = c(0.025, 0.025), ylab=ylab, xlab=xlab, margins=c(3,3),
             labCol=labCol, labRow=labRow, offsetRow=0, offsetCol=0,
             breaks=sort(c(0.1,seq(0, max(adj),length.out=10))),
             ...)

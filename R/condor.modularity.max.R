@@ -54,6 +54,10 @@ condor.modularity.max = function(condor.object,T0=cbind(1:q,rep(1,q)),weights=1)
     red.names <- levels(factor(esub[,1]))
     blues <- as.integer(factor(esub[,2]))
     blue.names <- levels(factor(esub[,2]))
+    # ensure that weights are greater than or equal to zero
+    if(any(weights < 0)){
+        stop("Negative weights are not allowed.")
+    }
     #ensure that nrows > ncols
     if(length(red.names) < length(blue.names)){
         stop("Adjacency matrix dimension error: This code requires nrows > ncols")

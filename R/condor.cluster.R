@@ -44,6 +44,9 @@ condor.cluster <- function(condor.object,cs.method="LCS",project=TRUE){
     else {
       weights <- rep(1, nrow(elist))
     }
+    if(any(weights < 0)){
+      stop("Negative weights are not allowed.")
+    }
     
     #make sure there's only one connected component
     g.component.test <- graph.data.frame(elist,directed=FALSE)

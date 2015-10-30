@@ -90,9 +90,10 @@ condor.modularity.max = function(condor.object,T0=cbind(1:q,rep(1,q)),weights=1)
     iter=1
     while(round(deltaQ,digits=4) > 0){
         btr <- BTR <- bt <- BT <- vector();
+        pb <- txtProgressBar(style=3, max=p+q)
         #calculate T tilde
         for(i in 1:p){
-            if(i %% 2500 == 0){print(sprintf("%s%% through iteration %s",round(i/p*100,digits=1),iter))}
+            setTxtProgressBar(pb, i)
             #find the optimal community for node i
             bt <- rep(0,length(cs))
             for(k in cs){
@@ -108,9 +109,7 @@ condor.modularity.max = function(condor.object,T0=cbind(1:q,rep(1,q)),weights=1)
                 print("making new comm")
                 R[i,2] <- max(Tmat[,2])+1
                 cs <- sort(c(cs,R[i,2]))
-            }
-            #if(length(h) > 1){h <- sample(h,1)}
-            if(bt[h] >= 0){
+            } else {
                 R[i,2] <- h # assign blue vertex i to comm k such that Q is maximized
                 bt[-h] <- 0 # BTR is zero if i is not in k (see definition of Q)
             }
@@ -118,8 +117,8 @@ condor.modularity.max = function(condor.object,T0=cbind(1:q,rep(1,q)),weights=1)
             #BT <- rbind(BT,bt)
         }
         #calculate R tilde, i.e., B_transpose * R
-        for(j in 1:q)
-        {
+        for(j in 1:q){
+          setTxtProgressBar(pb, p+j)
             #initialize jth row of (B_transpose) * R
             btr = rep(0,length(cs))
             #calculate Q for assigning j to different communities
@@ -136,17 +135,14 @@ condor.modularity.max = function(condor.object,T0=cbind(1:q,rep(1,q)),weights=1)
             g = which.max(btr)
             #if there is no comm. assignment to increase modularity, make
             #a new community with that node only
-            if(btr[g] < 0)
-            {
+            if(btr[g] < 0){
                 print("making new comm")
                 Tmat[j,2] <- max(R[,2])+1
                 btr <- rep(0,length(cs)+1)
                 cs <- c(cs,Tmat[j,2])
                 btr[length(cs)] <- sum(A[,j]-(ki*dj[j])/m)
                 print(btr)
-            }
-            if(btr[g] >= 0)
-            {
+            } else {
                 Tmat[j,2] <- g
                 btr[-g] <- 0
             }
@@ -160,13 +156,14 @@ condor.modularity.max = function(condor.object,T0=cbind(1:q,rep(1,q)),weights=1)
         Qthen <- Qnow
         Qcom <- diag(Tt %*% BTR)/m
         Qnow <- sum(Qcom)
-        Qhist = c(Qhist,Qnow)
+        Qhist <- c(Qhist,Qnow)
         
-        print(paste("Q =",Qnow,sep=" "))
+        print(sprintf("Iteration %s Q: %s", iter, Qnow))
         if(round(Qnow,digits=4) != 0 && round(Qnow,digits=4) != 0){
-            deltaQ = Qnow - Qthen
+            deltaQ <- Qnow - Qthen
         }
-        iter=iter+1
+        iter <- iter+1
+        close(pb)
     }
     #__________end_while_____________
     qcom_temp <- cbind(Qcom,sort(unique(cs)))

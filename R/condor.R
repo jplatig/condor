@@ -14,6 +14,7 @@
 #' are projected and clustered using \code{cs.method}. If FALSE, the 
 #' complete bipartite network is clustered using the unipartite clustering 
 #' methods listed in \code{cs.method}.
+#' @param norm TRUE/FALSE - if TRUE, normalize core score by community modularity
 #' @return \code{condor.object}
 #' @examples 
 #' r = c(1,1,1,2,2,2,3,3,3,4,4);
@@ -26,12 +27,12 @@
 #' @import Matrix
 #' @export
 #' 
-condor <- function(edgelist,return.gcc=TRUE,cs.method="LCS",project=TRUE){
+condor <- function(edgelist,return.gcc=TRUE,cs.method="LCS",project=TRUE,norm=TRUE){
   condor.object <- create.condor.object(edgelist, return.gcc)
   message("Clustering bipartite network...")
   condor.object <- condor.cluster(condor.object, cs.method, project)
   message("Computing core scores...")
-  condor.object <- condor.qscore(condor.object)
+  condor.object <- condor.qscore(condor.object, norm=norm)
   message("DONE")
   return(condor.object)
 }

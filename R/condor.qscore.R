@@ -4,6 +4,7 @@
 #'contributed by each node to its community's modularity 
 #' @param condor.object output of \code{\link{condor.cluster}} or 
 #' \code{\link{condor.modularity.max}}
+#' @param norm TRUE/FALSE - if TRUE, normalize core score by community modularity
 #' @return condor.object list has \code{condor.object$qscores} added to it.
 #' this includes two data.frames, \code{blue.qscore} and \code{red.qscore}
 #' which have the qscore for each red and blue node.
@@ -22,11 +23,11 @@
 #' @import Matrix
 #' @export
 #' 
-condor.qscore = function(condor.object){
+condor.qscore = function(condor.object, norm=TRUE){
     
-        if(is.null(condor.object$red.memb) | is.null(condor.object$blue.memb)){
+    if(is.null(condor.object$red.memb) | is.null(condor.object$blue.memb)){
         stop("Community Memberships missing. Run condor.cluster or condor.modularity.max first!")
-        }
+    }
     bo <- condor.object
     bo$blue.memb <- bo$blue.memb[order(bo$blue.memb[,"names"]),]
     bo$red.memb <- bo$red.memb[order(bo$red.memb[,"names"]),]
@@ -68,13 +69,19 @@ condor.qscore = function(condor.object){
     for(j in 1:max(t1[,1])){
         setTxtProgressBar(pb, j)
         Bj = A[,j] - (ki*dj[j])/m;
-        Qjk[j] = ((Rtrans[t1[j,2],] %*% Bj)/(2*m))*(1/Qcoms[t1[j,2],1])
+        Qjk[j] = (Rtrans[t1[j,2],] %*% Bj)/(2*m)
+        if(norm){
+            Qjk[j] <- Qjk[j]/Qcoms[t1[j,2],1]
+        }
     }  
     Qik = vector(length=p)
     for(i in 1:max(r1[,1])){
         setTxtProgressBar(pb, max(t1[,1])+i)
         Bi = A[i,] - (ki[i]*dj)/m;
-        Qik[i] = ((Bi %*% T2[,r1[i,2]])/(2*m))*(1/Qcoms[r1[i,2],1])  
+        Qik[i] = (Bi %*% T2[,r1[i,2]])/(2*m)
+        if(norm){
+            Qik[i] <- Qik[i]/Qcoms[r1[i,2],1]
+        }
     }
     close(pb)
     condor.object$qscores = list(blue.qscore=data.frame(T1,Q=Qjk),red.qscore=data.frame(R1,Q=Qik))

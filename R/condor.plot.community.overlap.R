@@ -30,8 +30,8 @@ condor.plot.community.overlap <- function(x, y, xlab="Condition y", ylab="Condit
     zplot <- t(t(zplot)/colSums(zplot))
   }
   heatmap.2(zplot, trace="none", xlab=xlab, ylab=ylab, scale="none",
-            col=colorpanel(10, "white", "black"),
-            breaks=sort(c(0.1,seq(0, max(zplot),length.out=10))),
+            col=colorpanel(10, "white", "black"), dendrogram="none",
+            breaks=sort(c(1e-4,seq(0, max(zplot),length.out=10))),
             ...)
   res <- list(x=x, y=y, z=z)
   return(res)

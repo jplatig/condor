@@ -4,11 +4,13 @@
 \alias{condor.qscore}
 \title{Calculate Qscore for all nodes}
 \usage{
-condor.qscore(condor.object)
+condor.qscore(condor.object, norm = TRUE)
 }
 \arguments{
 \item{condor.object}{output of \code{\link{condor.cluster}} or
 \code{\link{condor.modularity.max}}}
+
+\item{norm}{TRUE/FALSE - if TRUE, normalize core score by community modularity}
 }
 \value{
 condor.object list has \code{condor.object$qscores} added to it.

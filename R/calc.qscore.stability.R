@@ -3,7 +3,7 @@
 #' Classifies each node as either stable or variable based on the output of \code{\link{condor.plot.community.overlap}}
 #' 
 #' @param res Output of \code{\link{condor.plot.community.overlap}}
-#' @param by chaacter string indicating whether to determine stability by 'row', 'column', or 'both'
+#' @param by character string indicating whether to determine stability by 'row', 'column', or 'both'
 #' @return A data frame with modularity of both conditions and stability
 #' @export
 #' 

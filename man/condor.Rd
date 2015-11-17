@@ -4,7 +4,8 @@
 \alias{condor}
 \title{Wrapper for core condor functions}
 \usage{
-condor(edgelist, return.gcc = TRUE, cs.method = "LCS", project = TRUE)
+condor(edgelist, return.gcc = TRUE, cs.method = "LCS", project = TRUE,
+  norm = TRUE)
 }
 \arguments{
 \item{return.gcc}{if TRUE, returns the giant connected component}
@@ -21,6 +22,8 @@ If TRUE, the nodes in the first column of \code{condor.object$edges}
 are projected and clustered using \code{cs.method}. If FALSE, the
 complete bipartite network is clustered using the unipartite clustering
 methods listed in \code{cs.method}.}
+
+\item{norm}{TRUE/FALSE - if TRUE, normalize core score by community modularity}
 }
 \value{
 \code{condor.object}

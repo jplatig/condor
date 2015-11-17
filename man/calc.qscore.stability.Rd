@@ -9,7 +9,7 @@ calc.qscore.stability(res, by = c("both", "row", "column"))
 \arguments{
 \item{res}{Output of \code{\link{condor.plot.community.overlap}}}
 
-\item{by}{chaacter string indicating whether to determine stability by 'row', 'column', or 'both'}
+\item{by}{character string indicating whether to determine stability by 'row', 'column', or 'both'}
 }
 \value{
 A data frame with modularity of both conditions and stability

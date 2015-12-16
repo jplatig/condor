@@ -8,6 +8,12 @@ condor(edgelist, return.gcc = TRUE, cs.method = "LCS", project = TRUE,
   norm = TRUE)
 }
 \arguments{
+\item{edgelist}{a data.frame with 'red' nodes in the first column and
+'blue' nodes in the second column, representing links from the node in
+the first column to the node in the second column. There must be more
+unique 'red' nodes than 'blue' nodes. Optionally, a third column may be
+provided to create a weighted network.}
+
 \item{return.gcc}{if TRUE, returns the giant connected component}
 
 \item{cs.method}{is a string to specify which unipartite community

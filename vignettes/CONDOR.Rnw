@@ -8,7 +8,7 @@
 \SweaveOpts{concordance=TRUE}
 \SweaveOpts{engine=R}
 %\VignetteIndexEntry{condor} 
-%\VignetteDepends{condor,igraph,gplots} 
+%\VignetteDepends{condor,igraph,ggplot2} 
 %\VignetteKeywords{condor} 
 %\VignettePackage{condor}
 %\VignetteEngine{Sweave}
@@ -49,7 +49,7 @@ A condor.object is just a list. You can look at the different items using \textb
 names(condor.object)
 @
 \textbf{condor.cluster} will cluster the nodes and produce the overall modularity along with two community membership \textbf{data.frames}:
-<<>>=
+<<results=hide>>=
 condor.object <- condor.cluster(condor.object)
 print(condor.object$red.memb)
 print(condor.object$blue.memb)
@@ -67,27 +67,29 @@ plot(gtoy,vertex.label.dist=2)
 @
 
 To get each node's modularity contribution (as a fraction of the community's modularity), run
-<<>>=
+<<results=hide>>=
 condor.object <- condor.qscore(condor.object)
 @
 If you have a subset of nodes that you think are more likely to lie at the cores of your communities, you can test this using \textbf{condor.core.enrich}:
 
 <<fig=TRUE>>=
 q_women <- condor.object$qscores$red.qscore
-core_stats <- condor.core.enrich(test_nodes=c("Alice","Mary"),
-                                 q=q_women,perm=TRUE,plot.hist=TRUE)
+core_stats <- suppressWarnings(condor.core.enrich(test_nodes=c("Alice","Mary"),
+                                                  q=q_women,perm=TRUE,plot.hist=TRUE))
 @
 
 \textbf{condor} also works on weighted bipartite networks. The package comes with a quantitative pollination network data set (Small 1976) taken from the NCEAS interaction webs data base, containing interactions between 13 plants and 34 pollinators.
-<<>>=
+<<results=hide>>=
 data(small1976)
 condor.object <- create.condor.object(small1976)
-condor.object <- condor.cluster(condor.object, project=F)
+condor.object <- condor.cluster(condor.object, project=FALSE)
 @
 
 <<fig=TRUE>>=
-condor.plot.heatmap(condor.object)
+condor.plot.heatmap(condor.object, xlab="Plants", ylab="Pollinators", color=TRUE)
 @
+
+Each hue represents a different community and the value represents the edge weight.
 
 If you have questions, contact John Platig at \href{mailto:jplatig@jimmy.harvard.edu}{jplatig@jimmy.harvard.edu}
 

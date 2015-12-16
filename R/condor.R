@@ -2,6 +2,11 @@
 #' 
 #' Given an input edge list, this function performs community structure clustering and
 #' calculates core scores.
+#' @param edgelist a data.frame with 'red' nodes in the first column and
+#' 'blue' nodes in the second column, representing links from the node in
+#' the first column to the node in the second column. There must be more
+#' unique 'red' nodes than 'blue' nodes. Optionally, a third column may be
+#' provided to create a weighted network.
 #' @param return.gcc if TRUE, returns the giant connected component
 #' @param cs.method is a string to specify which unipartite community 
 #' structure algorithm should be used for the seed clustering. 

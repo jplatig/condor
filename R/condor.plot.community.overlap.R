@@ -5,6 +5,7 @@
 #' @param scale character indicating if the values should be scaled in either the row direction or the column direction, or none. The default is \code{"none"}.
 #' @param xlab x-axis label
 #' @param ylab y-axis label
+#' @param scale.condition character indicating if the values should be scaled proportionally in either the row direction or the column direction, or none. The default is "none".
 #' @param ... other arguments passed to heatmap.2
 #' @return matrix containing overlap between each pair of communities
 #' @import igraph

@@ -16,6 +16,8 @@ condor.plot.community.overlap(x, y, xlab = "Condition y",
 
 \item{ylab}{y-axis label}
 
+\item{scale.condition}{character indicating if the values should be scaled proportionally in either the row direction or the column direction, or none. The default is "none".}
+
 \item{...}{other arguments passed to heatmap.2}
 
 \item{scale}{character indicating if the values should be scaled in either the row direction or the column direction, or none. The default is \code{"none"}.}

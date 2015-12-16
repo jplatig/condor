@@ -108,8 +108,12 @@ condor.cluster <- function(condor.object,cs.method="LCS",project=TRUE){
     }
     #run bipartite modularity maximization using initial assignments T0
     condor.object <- condor.modularity.max(condor.object,T0=T0,weights=weights)
-    
+    # order communities by size and reassign community membership
+    coms.sorted <- as.numeric(names(sort(table(condor.object$blue.memb[,2]), decreasing=TRUE)))
+    condor.object$blue.memb$com <- match(condor.object$blue.memb$com, coms.sorted)
+    condor.object$red.memb$com <- match(condor.object$red.memb$com, coms.sorted)
+    condor.object$Qcoms[,2] <- match(condor.object$Qcoms[,2], coms.sorted)
     return(condor.object)
-    }
+}
 
 

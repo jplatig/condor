@@ -4,17 +4,24 @@
 \alias{calc.qscore.stability}
 \title{Classifies each node as either stable or variable between two conditions}
 \usage{
-calc.qscore.stability(res, by = c("both", "row", "column"))
+calc.qscore.stability(x, y, type = c("red", "blue"), by = c("column", "row",
+  "both"))
 }
 \arguments{
-\item{res}{Output of \code{\link{condor.plot.community.overlap}}}
+\item{x}{first output of \code{\link{condor.qscore}}}
 
-\item{by}{character string indicating whether to determine stability by 'row', 'column', or 'both'}
+\item{y}{second output of \code{\link{condor.qscore}}}
+
+\item{type}{character indicating whether overlaps should be determined for blue or red nodes}
+
+\item{by}{character indicating whether to determine stability by 'row', 'column', or 'both'.
+Default is "column"}
 }
 \value{
-A data frame with modularity of both conditions and stability
+data.frame with core scores of both conditions and stability
 }
 \description{
-Classifies each node as either stable or variable based on the output of \code{\link{condor.plot.community.overlap}}
+Classifies each node as either stable (remaining in the most shared
+community between conditions) or variable (switching communities)
 }
 

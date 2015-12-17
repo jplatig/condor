@@ -4,26 +4,24 @@
 \alias{condor.plot.community.overlap}
 \title{Plots overlap between communities for two condor objects with identical nodes}
 \usage{
-condor.plot.community.overlap(x, y, xlab = "Condition y",
-  ylab = "Condition x", scale.condition = c("none", "row", "column"), ...)
+condor.plot.community.overlap(x, y, type = c("red", "blue"),
+  scale = c("none", "row", "column"))
 }
 \arguments{
-\item{x}{First condor.object membership or qscores data.frame}
+\item{x}{first output of \code{\link{condor.cluster}},
+\code{\link{condor.modularity.max}}, or \code{\link{condor.qscore}}}
 
-\item{y}{Second condor.object membership or qscores data.frame}
+\item{y}{second output of \code{\link{condor.qscore}},
+\code{\link{condor.modularity.max}}, or \code{\link{condor.qscore}}}
 
-\item{xlab}{x-axis label}
-
-\item{ylab}{y-axis label}
-
-\item{scale.condition}{character indicating if the values should be scaled proportionally in either the row direction or the column direction, or none. The default is "none".}
-
-\item{...}{other arguments passed to heatmap.2}
+\item{type}{character indicating whether overlaps should be determined for blue or red nodes}
 
 \item{scale}{character indicating if the values should be scaled in either the row direction or the column direction, or none. The default is \code{"none"}.}
+
+\item{scale}{character indicating if the values should be scaled proportionally in either the row direction or the column direction, or none. The default is "none".}
 }
 \value{
-matrix containing overlap between each pair of communities
+produces a ggplot object
 }
 \description{
 Plots overlap between communities for two condor objects with identical nodes

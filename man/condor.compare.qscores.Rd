@@ -2,17 +2,22 @@
 % Please edit documentation in R/condor.compare.qscores.R
 \name{condor.compare.qscores}
 \alias{condor.compare.qscores}
-\title{Plots boxplots of core score distributions by condition and by stability}
+\title{Plots boxplots of core score distributions by condition and by stability for both red and blue nodes}
 \usage{
-condor.compare.qscores(qscore, lab.x = "Condition x", lab.y = "Condition y",
-  scale.log = FALSE, nsamp = 10000)
+condor.compare.qscores(x, y, by = c("column", "row", "both"),
+  label.x = "Condition x", label.y = "Condition y", red.name = "red",
+  blue.name = "blue", scale.log = FALSE, nsamp = 10000)
 }
 \arguments{
-\item{qscore}{Output of \code{\link{calc.qscore.stability}}}
+\item{x}{first output of \code{\link{condor.qscore}}}
 
-\item{lab.x}{Label of first condition}
+\item{y}{second output of \code{\link{condor.qscore}}}
 
-\item{lab.y}{Label of second condition}
+\item{by}{character indicating whether to determine stability by 'row', 'column', or 'both'}
+
+\item{label.x}{Label of first condition}
+
+\item{label.y}{Label of second condition}
 
 \item{scale.log}{TRUE/FALSE - If TRUE, plot log core scores}
 

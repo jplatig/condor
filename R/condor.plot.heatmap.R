@@ -4,13 +4,18 @@
 #' @param condor.object output of either \code{\link{condor.cluster}} or 
 #' \code{\link{condor.modularity.max}}
 #' @param community.ticks if TRUE, plot community numbers in x and y axes rather than column and row names
-#' @param color if TRUE, fill in communities with solid colors
+#' @param add.color if TRUE, fill in communities with solid colors
 #' @param colors character vector of colors of length equal to the number of communities
 #' in the network
 #' @param log if TRUE, transform the color gradient to log-scale.
 #' @param xlab a title for the x axis
 #' @param ylab a title for the y axis
-#' @return produces a ggplot object if color is FALSE, else no return value
+#' @param main a title for the plot
+#' @param legend.position side the legend is placed
+#' @param tick.min.prop minimum proportion of genes/TFs a community must contain to have a visible tick mark, used to prevent overlap
+#' @param xlabels optional character vector of length equal to the number of communities to manually mark the x-axis community ticks
+#' @param ylabels optional character vector of length equal to the number of communities to manually mark the y-axis community ticks
+#' @return produces a ggplot object if \code{color} is FALSE, else no return value
 #' @examples
 #' data(small1976)
 #' condor.object <- create.condor.object(small1976)
@@ -21,7 +26,10 @@
 #' @import RColorBrewer
 #' @export
 #'  
-condor.plot.heatmap = function(condor.object, community.ticks=FALSE, color=FALSE, colors=NULL, log=FALSE, xlab="blues", ylab="reds"){
+condor.plot.heatmap = function(condor.object, community.ticks=FALSE, add.color=FALSE,
+                               colors=NULL, log=FALSE, xlab="blues", ylab="reds",
+                               main="", tick.min.prop=0.05, xlabels=NULL, ylabels=NULL,
+                               legend.position="right"){
   # set edges in unweighted graph to have weight of 1
   if (is.null(get.edge.attribute(condor.object$G, "weight"))) {
     condor.object$G <- set.edge.attribute(condor.object$G, "weight", value=1)
@@ -36,17 +44,46 @@ condor.plot.heatmap = function(condor.object, community.ticks=FALSE, color=FALSE
   adj <- adj[,blues]
   rowsep <- cumsum(as.vector(table(condor.object$red.memb[,2])))
   colsep <- cumsum(as.vector(table(condor.object$blue.memb[,2])))
-  lab <- unique(as.character(sort(condor.object$blue.memb[,2])))
-  ncom <- length(lab)
+  ncom <- max(condor.object$blue.memb[,2])
   all.links <- melt(adj)
   
+  # get x-axis tick mark locations
+  xbreaks <- colnames(adj)[c(1, colsep[-length(colsep)] + 1)]
+  ybreaks <- rownames(adj)[c(1, rowsep[-length(rowsep)] + 1)]
+  if (is.null(xlabels)) {
+    xlabels <- unique(as.character(sort(condor.object$blue.memb[,2])))
+    # remove x-axis tick marks that may cause overcrowding
+    idx <- which(diff(colsep) < max(colsep) * tick.min.prop)[1]
+    if (!is.na(idx)) {
+      xlabels[seq(idx + 2, length(xbreaks), 2)] <- ""  
+    }
+  }
+  if (is.null(ylabels)) {
+    ylabels <- unique(as.character(sort(condor.object$blue.memb[,2])))
+    # remove y-axis tick marks that may cause overcrowding
+    row.diff <- diff(rowsep)
+    row.rle <- rle(row.diff)
+    idx <- which(row.rle$values < max(rowsep) * tick.min.prop)
+    if (length(idx) > 0) {
+      rm.idx <- c()
+      for(i in idx) {
+        csum <- sum(row.rle$len[1:(idx-1)])
+        rm.idx <- c(rm.idx, seq(csum + 2, csum + row.rle$lengths[i] + 1, 2))
+      }
+      ylabels[rm.idx] <- ""  
+    }
+  }
+  
+  # plot heatmap
   p <- ggplot() +
     geom_tile(data=all.links, aes(Var2, Var1, fill=value)) +
     xlab(xlab) + 
-    ylab(ylab)
+    ylab(ylab) +
+    ggtitle(main) +
+    theme(legend.position=legend.position)
   if (community.ticks) {
-    p <- p + scale_y_discrete(breaks=rownames(adj)[c(1, rowsep[-length(rowsep)])], labels=lab) +
-      scale_x_discrete(breaks=colnames(adj)[c(1, colsep[-length(colsep)])], labels=lab)
+    p <- p + scale_y_discrete(breaks=ybreaks, labels=ylabels) +
+      scale_x_discrete(breaks=xbreaks, labels=xlabels)
   } else {
     p <- p + theme(axis.text.x = element_text(angle = 45, hjust = 1))
   }
@@ -55,7 +92,7 @@ condor.plot.heatmap = function(condor.object, community.ticks=FALSE, color=FALSE
   } else {
     p <- p + scale_fill_gradient(name="Edge weight", low="white", high="gray20", na.value="white")
   }
-  if (color) {
+  if (add.color) {
     combo.grob <- ggplotGrob(p)
     # get subset of adj that contains within-community links
     row.idx <- c(1, rowsep[-length(rowsep)] + 1)
@@ -82,8 +119,8 @@ condor.plot.heatmap = function(condor.object, community.ticks=FALSE, color=FALSE
       com.links <- melt(m)
       p2 <- ggplot() + geom_tile(data=com.links, aes(Var2, Var1, fill=value))
       if (community.ticks) {
-        p2 <- p2 + scale_y_discrete(breaks=rownames(adj)[c(1, rowsep[-length(rowsep)])], labels=lab) +
-          scale_x_discrete(breaks=colnames(adj)[c(1, colsep[-length(colsep)])], labels=lab)
+        p2 <- p2 + scale_y_discrete(breaks=xbreaks, labels=xlabels) +
+          scale_x_discrete(breaks=ybreaks, labels=ylabels)
       } else {
         p2 <- p2 + theme(axis.text.x = element_text(angle = 45, hjust = 1))
       }
@@ -109,5 +146,4 @@ condor.plot.heatmap = function(condor.object, community.ticks=FALSE, color=FALSE
   } else {
     p
   }
-  
 }

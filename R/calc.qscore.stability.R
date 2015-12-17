@@ -1,30 +1,48 @@
 #' Classifies each node as either stable or variable between two conditions
 #' 
-#' Classifies each node as either stable or variable based on the output of \code{\link{condor.plot.community.overlap}}
+#' Classifies each node as either stable (remaining in the most shared
+#' community between conditions) or variable (switching communities)
 #' 
-#' @param res Output of \code{\link{condor.plot.community.overlap}}
-#' @param by character string indicating whether to determine stability by 'row', 'column', or 'both'
-#' @return A data frame with modularity of both conditions and stability
+#' @param x first output of \code{\link{condor.qscore}}
+#' @param y second output of \code{\link{condor.qscore}}
+#' @param type character indicating whether overlaps should be determined for blue or red nodes
+#' @param by character indicating whether to determine stability by 'row', 'column', or 'both'.
+#' Default is "column"
+#' @return data.frame with core scores of both conditions and stability
 #' @export
 #' 
-calc.qscore.stability <- function(res, by=c("both","row","column")) {
-  if (is.null(res$x$Q) | is.null(res$y$Q)) {
-    stop("condor.plot.community.overlap must be run on qscores to use this function.")
+calc.qscore.stability <- function(x, y, type=c("red", "blue"), by=c("column","row","both")) {
+  if (is.null(x$qscores) | is.null(y$qscores)) {
+    stop("condor.qscore must be run first to use this function.")
   }
+  type <- match.arg(type)
   by <- match.arg(by)
-  qscore <- merge(res$x, res$y, by="names")
-  com.map.x <- apply(res$z, 1, function(x){which(x==max(x))})
-  com.map.y <- apply(res$z, 2, function(x){which(x==max(x))})
+  x.memb <- x[[sprintf("%s.memb", type)]]
+  y.memb <- y[[sprintf("%s.memb", type)]]
+  # calculate overlap
+  xs <- split(x.memb, x.memb$com)
+  ys <- split(y.memb, y.memb$com)
+  overlap <- matrix(nrow=max(x.memb$com), ncol=max(y.memb$com))
+  for (i in 1:nrow(overlap)) {
+    for (j in 1:ncol(overlap)) {
+      overlap[i, j] <- length(intersect(xs[[i]]$names, ys[[j]]$names))
+    }
+  }
+  x.qscore <- x$qscores[[sprintf("%s.qscore", type)]]
+  y.qscore <- y$qscores[[sprintf("%s.qscore", type)]]
+  qscore <- merge(x.qscore, y.qscore, by="names")
+  com.map.x <- apply(overlap, 1, function(x){which(x==max(x))})
+  com.map.y <- apply(overlap, 2, function(x){which(x==max(x))})
   # get all stable genes
   stable.x <- stable.y <- stable.genes <- c()
-  for (i in 1:nrow(res$z)) {
-    stable.x1 <- subset(res$x, com==i)$names
-    stable.x2 <- subset(res$y, com%in%com.map.x[[i]])$names
+  for (i in 1:nrow(overlap)) {
+    stable.x1 <- subset(x.qscore, com==i)$names
+    stable.x2 <- subset(y.qscore, com%in%com.map.x[[i]])$names
     stable.x <- c(stable.x, intersect(stable.x1, stable.x2))
   }
-  for (i in 1:ncol(res$z)) {
-    stable.y1 <- subset(res$y, com==i)$names
-    stable.y2 <- subset(res$x, com%in%com.map.y[[i]])$names
+  for (i in 1:ncol(overlap)) {
+    stable.y1 <- subset(y.qscore, com==i)$names
+    stable.y2 <- subset(x.qscore, com%in%com.map.y[[i]])$names
     stable.y <- c(stable.y, intersect(stable.y1, stable.y2))
   }
   if (by=="row") {
@@ -36,6 +54,6 @@ calc.qscore.stability <- function(res, by=c("both","row","column")) {
   if (by=="both") {
     stable.genes <- intersect(stable.x, stable.y)
   }
-  qscore$stable <- with(qscore, names %in% stable.genes)
+  qscore$is.stable <- with(qscore, names %in% stable.genes)
   return(qscore)
 }

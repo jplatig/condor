@@ -4,8 +4,10 @@
 \alias{condor.plot.heatmap}
 \title{Plot weighted adjacency matrix with links grouped by community}
 \usage{
-condor.plot.heatmap(condor.object, community.ticks = FALSE, color = FALSE,
-  colors = NULL, log = FALSE, xlab = "blues", ylab = "reds")
+condor.plot.heatmap(condor.object, community.ticks = FALSE,
+  add.color = FALSE, colors = NULL, log = FALSE, xlab = "blues",
+  ylab = "reds", main = "", tick.min.prop = 0.05, xlabels = NULL,
+  ylabels = NULL, legend.position = "right")
 }
 \arguments{
 \item{condor.object}{output of either \code{\link{condor.cluster}} or
@@ -13,7 +15,7 @@ condor.plot.heatmap(condor.object, community.ticks = FALSE, color = FALSE,
 
 \item{community.ticks}{if TRUE, plot community numbers in x and y axes rather than column and row names}
 
-\item{color}{if TRUE, fill in communities with solid colors}
+\item{add.color}{if TRUE, fill in communities with solid colors}
 
 \item{colors}{character vector of colors of length equal to the number of communities
 in the network}
@@ -23,9 +25,19 @@ in the network}
 \item{xlab}{a title for the x axis}
 
 \item{ylab}{a title for the y axis}
+
+\item{main}{a title for the plot}
+
+\item{tick.min.prop}{minimum proportion of genes/TFs a community must contain to have a visible tick mark, used to prevent overlap}
+
+\item{xlabels}{optional character vector of length equal to the number of communities to manually mark the x-axis community ticks}
+
+\item{ylabels}{optional character vector of length equal to the number of communities to manually mark the y-axis community ticks}
+
+\item{legend.position}{side the legend is placed}
 }
 \value{
-produces a ggplot object if color is FALSE, else no return value
+produces a ggplot object if \code{color} is FALSE, else no return value
 }
 \description{
 This function will generate the network link 'heatmap' for a weighted network

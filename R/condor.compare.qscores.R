@@ -1,9 +1,11 @@
-#' Plots boxplots of core score distributions by condition and by stability
+#' Plots boxplots of core score distributions by condition and by stability for both red and blue nodes
 #' 
 #' This function tests whether core scores of stable nodes are higher than those of variable nodes
-#' @param qscore Output of \code{\link{calc.qscore.stability}}
-#' @param lab.x Label of first condition
-#' @param lab.y Label of second condition
+#' @param x first output of \code{\link{condor.qscore}}
+#' @param y second output of \code{\link{condor.qscore}}
+#' @param by character indicating whether to determine stability by 'row', 'column', or 'both'
+#' @param label.x Label of first condition
+#' @param label.y Label of second condition
 #' @param scale.log TRUE/FALSE - If TRUE, plot log core scores
 #' @param nsamp Number of permutation tests to run, passed to \code{\link{condor.core.enrich}}
 #' @return ggplot object
@@ -11,36 +13,48 @@
 #' @import Matrix
 #' @export
 #' 
-condor.compare.qscores <- function(qscore, lab.x="Condition x", lab.y="Condition y", scale.log=FALSE, nsamp=1e4) {
-  d <- melt(qscore, measure.vars = c("Q.x", "Q.y"))
-  stable.genes <- qscore$names[which(qscore$stable)]
-  x <- qscore[,c("names","com.x","Q.x")]
-  y <- qscore[,c("names","com.y","Q.y")]
+condor.compare.qscores <- function(x, y, by=c("column","row","both"),
+                                   label.x="Condition x", label.y="Condition y",
+                                   red.name="red", blue.name="blue", scale.log=FALSE, nsamp=1e4) {
+  ylabel <- ifelse(scale.log, "log(core score)", "Core score")
+  qscore.red <- calc.qscore.stability(x, y, type="red", by=by)
+  qscore.blue <- calc.qscore.stability(x, y, type="blue", by=by)
   
-  x.p <- condor.core.enrich(stable.genes, x, perm=TRUE, nsamp=nsamp)$perm.pvals
-  y.p <- condor.core.enrich(stable.genes, y, perm=TRUE, nsamp=nsamp)$perm.pvals
-  
-  df <- data.frame(variable=c("Q.x", "Q.y"),
-                   p=c(x.p$wilcox.perm, y.p$wilcox.perm),
-                   ks=c(x.p$ks.perm, y.p$ks.perm))
-  d <- merge(d, df, by="variable")
-  
-  d$p <- paste("Wilcox p:", format(d$p, scientific=T, digits=2))
-  d$ks <- paste("KS p:", format(d$ks, scientific=T, digits=2))
-  d$p <- paste(d$p, d$ks, sep='\n')
-  
-  ylabel <- "core score"
+  perm.test <- function(qscore, type) {
+    d <- melt(qscore, measure.vars = c("Q.x", "Q.y"))
+    stable.genes <- qscore$names[which(qscore$is.stable)]
+    x <- qscore[,c("names","com.x","Q.x")]
+    y <- qscore[,c("names","com.y","Q.y")]
+    
+    x.p <- condor.core.enrich(stable.genes, x, perm=TRUE, nsamp=nsamp)$perm.pvals
+    y.p <- condor.core.enrich(stable.genes, y, perm=TRUE, nsamp=nsamp)$perm.pvals
+    
+    df <- data.frame(variable=c("Q.x", "Q.y"),
+                     p=c(x.p$wilcox.perm, y.p$wilcox.perm),
+                     ks=c(x.p$ks.perm, y.p$ks.perm))
+    d <- merge(d, df, by="variable")
+    
+    d$p <- paste("Wilcox p:", format(d$p, scientific=T, digits=2))
+    d$ks <- paste("KS p:", format(d$ks, scientific=T, digits=2))
+    d$p <- paste(d$p, d$ks, sep='\n')
+    d$type <- ifelse(type=="red", red.name, blue.name)
+    return(d)
+  }
+  d.red <- perm.test(qscore.red, "red")
+  d.blue <- perm.test(qscore.blue, "blue")
+  d <- rbind(d.red, d.blue)
   if (scale.log) {
     d$value <- log(d$value)
-    ylabel <- "log(core score)"
   }
-  
-  ggplot(d, aes(variable, value, fill=stable, label=p)) +
-    geom_boxplot(notch=TRUE) +
-    scale_fill_discrete(guide=guide_legend(title=NULL),
-                        labels=c("variable", "stable")) +
-    scale_x_discrete(labels=c(lab.x, lab.y)) +
-    xlab("condition") + ylab(ylabel) +
+  ggplot(d, aes(x=variable, y=value, fill=is.stable, color=is.stable, label=p), environment=environment()) +
+    geom_boxplot(fill="white", outlier.colour=NA, notch=TRUE,
+                 position=position_dodge(width=0.9)) +
+    geom_point(position=position_jitterdodge(dodge.width=0.9), alpha=0.3) +
+    scale_color_manual(name="", labels=c("Stable", "Variable"), values=c("seagreen4", "gray20")) +
+    scale_fill_discrete(guide=FALSE) +
+    scale_x_discrete(labels=c(label.x, label.y)) +
+    xlab("Condition") + ylab(ylabel) +
     ggtitle("Core score distributions by condition and stability") +
-    geom_text(data=d[c(1, nrow(d)),], y=max(d$value), vjust=1)
+    geom_text(data=d[!duplicated(paste0(d$variable, d$type)),], aes(x=variable, y=max(d$value)), vjust=1, position=position_dodge(width=0.9), size=10*5/14) +
+    facet_grid(type~., scales="free")
 }

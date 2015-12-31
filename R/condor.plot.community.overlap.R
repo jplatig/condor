@@ -4,9 +4,8 @@
 #' \code{\link{condor.modularity.max}}, or \code{\link{condor.qscore}}
 #' @param y second output of \code{\link{condor.qscore}}, 
 #' \code{\link{condor.modularity.max}}, or \code{\link{condor.qscore}}
-#' @param scale character indicating if the values should be scaled in either the row direction or the column direction, or none. The default is \code{"none"}.
 #' @param type character indicating whether overlaps should be determined for blue or red nodes
-#' @param scale character indicating if the values should be scaled proportionally in either the row direction or the column direction, or none. The default is "none".
+#' @param scale character indicating if the values should be scaled proportionally in either the row direction or the column direction, or none. The default is \code{"none"}.
 #' @return produces a ggplot object
 #' @import igraph
 #' @import Matrix

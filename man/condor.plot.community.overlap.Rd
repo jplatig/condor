@@ -16,9 +16,7 @@ condor.plot.community.overlap(x, y, type = c("red", "blue"),
 
 \item{type}{character indicating whether overlaps should be determined for blue or red nodes}
 
-\item{scale}{character indicating if the values should be scaled in either the row direction or the column direction, or none. The default is \code{"none"}.}
-
-\item{scale}{character indicating if the values should be scaled proportionally in either the row direction or the column direction, or none. The default is "none".}
+\item{scale}{character indicating if the values should be scaled proportionally in either the row direction or the column direction, or none. The default is \code{"none"}.}
 }
 \value{
 produces a ggplot object

@@ -4,16 +4,16 @@
 \alias{condor.plot.heatmap}
 \title{Plot weighted adjacency matrix with links grouped by community}
 \usage{
-condor.plot.heatmap(condor.object, community.ticks = FALSE,
+condor.plot.heatmap(condor.object, ticks = c("names", "coms", "none"),
   add.color = FALSE, colors = NULL, log = FALSE, xlab = "blues",
   ylab = "reds", main = "", tick.min.prop = 0.05, xlabels = NULL,
-  ylabels = NULL, legend.position = "right")
+  ylabels = NULL, legend.position = "right", transpose = FALSE)
 }
 \arguments{
 \item{condor.object}{output of either \code{\link{condor.cluster}} or
 \code{\link{condor.modularity.max}}}
 
-\item{community.ticks}{if TRUE, plot community numbers in x and y axes rather than column and row names}
+\item{ticks}{choose to display row and column names, red and blue community numbers or no axis ticks}
 
 \item{add.color}{if TRUE, fill in communities with solid colors}
 
@@ -35,6 +35,8 @@ in the network}
 \item{ylabels}{optional character vector of length equal to the number of communities to manually mark the y-axis community ticks}
 
 \item{legend.position}{side the legend is placed}
+
+\item{transpose}{if TRUE, plot reds in columns rather than rows}
 }
 \value{
 produces a ggplot object if \code{color} is FALSE, else no return value

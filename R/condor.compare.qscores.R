@@ -6,6 +6,8 @@
 #' @param by character indicating whether to determine stability by 'row', 'column', or 'both'
 #' @param label.x Label of first condition
 #' @param label.y Label of second condition
+#' @param red.name Name for red nodes
+#' @param blue.name Name for blue nodes
 #' @param scale.log TRUE/FALSE - If TRUE, plot log core scores
 #' @param nsamp Number of permutation tests to run, passed to \code{\link{condor.core.enrich}}
 #' @return ggplot object
@@ -50,7 +52,7 @@ condor.compare.qscores <- function(x, y, by=c("column","row","both"),
     geom_boxplot(fill="white", outlier.colour=NA, notch=TRUE,
                  position=position_dodge(width=0.9)) +
     geom_point(position=position_jitterdodge(dodge.width=0.9), alpha=0.3) +
-    scale_color_manual(name="", labels=c("Stable", "Variable"), values=c("seagreen4", "gray20")) +
+    scale_color_manual(name="", labels=c("Variable", "Stable"), values=c("seagreen4", "gray20")) +
     scale_fill_discrete(guide=FALSE) +
     scale_x_discrete(labels=c(label.x, label.y)) +
     xlab("Condition") + ylab(ylabel) +

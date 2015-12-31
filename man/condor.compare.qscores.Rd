@@ -19,6 +19,10 @@ condor.compare.qscores(x, y, by = c("column", "row", "both"),
 
 \item{label.y}{Label of second condition}
 
+\item{red.name}{Name for red nodes}
+
+\item{blue.name}{Name for blue nodes}
+
 \item{scale.log}{TRUE/FALSE - If TRUE, plot log core scores}
 
 \item{nsamp}{Number of permutation tests to run, passed to \code{\link{condor.core.enrich}}}

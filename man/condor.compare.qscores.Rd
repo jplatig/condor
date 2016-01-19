@@ -6,14 +6,15 @@
 \usage{
 condor.compare.qscores(x, y, by = c("column", "row", "both"),
   label.x = "Condition x", label.y = "Condition y", red.name = "red",
-  blue.name = "blue", scale.log = FALSE, nsamp = 10000)
+  blue.name = "blue", scale.log = FALSE, nsamp = 10000,
+  plot.type = c("violin", "points"))
 }
 \arguments{
 \item{x}{first output of \code{\link{condor.qscore}}}
 
 \item{y}{second output of \code{\link{condor.qscore}}}
 
-\item{by}{character indicating whether to determine stability by 'row', 'column', or 'both'}
+\item{by}{character string indicating whether to determine stability by 'row', 'column', or 'both'}
 
 \item{label.x}{Label of first condition}
 
@@ -26,6 +27,8 @@ condor.compare.qscores(x, y, by = c("column", "row", "both"),
 \item{scale.log}{TRUE/FALSE - If TRUE, plot log core scores}
 
 \item{nsamp}{Number of permutation tests to run, passed to \code{\link{condor.core.enrich}}}
+
+\item{plot.type}{character string indicating whether to plot violin plots or points}
 }
 \value{
 ggplot object

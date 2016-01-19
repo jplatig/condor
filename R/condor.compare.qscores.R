@@ -3,13 +3,14 @@
 #' This function tests whether core scores of stable nodes are higher than those of variable nodes
 #' @param x first output of \code{\link{condor.qscore}}
 #' @param y second output of \code{\link{condor.qscore}}
-#' @param by character indicating whether to determine stability by 'row', 'column', or 'both'
+#' @param by character string indicating whether to determine stability by 'row', 'column', or 'both'
 #' @param label.x Label of first condition
 #' @param label.y Label of second condition
 #' @param red.name Name for red nodes
 #' @param blue.name Name for blue nodes
 #' @param scale.log TRUE/FALSE - If TRUE, plot log core scores
 #' @param nsamp Number of permutation tests to run, passed to \code{\link{condor.core.enrich}}
+#' @param plot.type character string indicating whether to plot violin plots or points
 #' @return ggplot object
 #' @import igraph
 #' @import Matrix
@@ -17,7 +18,11 @@
 #' 
 condor.compare.qscores <- function(x, y, by=c("column","row","both"),
                                    label.x="Condition x", label.y="Condition y",
-                                   red.name="red", blue.name="blue", scale.log=FALSE, nsamp=1e4) {
+                                   red.name="red", blue.name="blue", scale.log=FALSE,
+                                   nsamp=1e4, plot.type=c("violin", "points")) {
+  by <- match.arg(by)
+  plot.type <- match.arg(plot.type)
+  
   ylabel <- ifelse(scale.log, "log(core score)", "Core score")
   qscore.red <- calc.qscore.stability(x, y, type="red", by=by)
   qscore.blue <- calc.qscore.stability(x, y, type="blue", by=by)
@@ -36,8 +41,8 @@ condor.compare.qscores <- function(x, y, by=c("column","row","both"),
                      ks=c(x.p$ks.perm, y.p$ks.perm))
     d <- merge(d, df, by="variable")
     
-    d$p <- paste("Wilcox p:", format(d$p, scientific=T, digits=2))
-    d$ks <- paste("KS p:", format(d$ks, scientific=T, digits=2))
+    d$p <- paste("Wilcoxon p-value = ", format(d$p, scientific=T, digits=2))
+    d$ks <- paste("KS p-value = ", format(d$ks, scientific=T, digits=2))
     d$p <- paste(d$p, d$ks, sep='\n')
     d$type <- ifelse(type=="red", red.name, blue.name)
     return(d)
@@ -48,15 +53,26 @@ condor.compare.qscores <- function(x, y, by=c("column","row","both"),
   if (scale.log) {
     d$value <- log(d$value)
   }
-  ggplot(d, aes(x=variable, y=value, fill=is.stable, color=is.stable, label=p), environment=environment()) +
-    geom_boxplot(fill="white", outlier.colour=NA, notch=TRUE,
-                 position=position_dodge(width=0.9)) +
-    geom_point(position=position_jitterdodge(dodge.width=0.9), alpha=0.3) +
-    scale_color_manual(name="", labels=c("Variable", "Stable"), values=c("seagreen4", "gray20")) +
-    scale_fill_discrete(guide=FALSE) +
-    scale_x_discrete(labels=c(label.x, label.y)) +
-    xlab("Condition") + ylab(ylabel) +
-    ggtitle("Core score distributions by condition and stability") +
-    geom_text(data=d[!duplicated(paste0(d$variable, d$type)),], aes(x=variable, y=max(d$value)), vjust=1, position=position_dodge(width=0.9), size=10*5/14) +
-    facet_grid(type~., scales="free")
+  if (plot.type=="violin") {
+    ggplot(d, aes(x=variable, y=value, color=is.stable, label=p), environment=environment()) +
+      geom_violin(position=position_dodge(width=0.8), adjust=0.5) +
+      geom_boxplot(width=0.1, notch=TRUE, outlier.colour=NA, position=position_dodge(width=0.8)) +
+      scale_color_manual(name="", labels=c("Variable", "Stable"), values=c("seagreen4", "gray20")) +
+      scale_x_discrete(labels=c(label.x, label.y)) +
+      xlab("Condition") + ylab(ylabel) +
+      geom_text(data=d[!duplicated(paste0(d$variable, d$type)),], aes(x=variable, y=max(d$value)), vjust=1, position=position_dodge(width=0.9), size=10*5/14) +
+      facet_grid(type~., scales="free")
+  } else {
+    ggplot(d, aes(x=variable, y=value, fill=is.stable, color=is.stable, label=p), environment=environment()) +
+      geom_boxplot(fill="white", outlier.colour=NA, notch=TRUE,
+                   position=position_dodge(width=0.9)) +
+      geom_point(position=position_jitterdodge(dodge.width=0.9), alpha=0.3) +
+      scale_color_manual(name="", labels=c("Variable", "Stable"), values=c("seagreen4", "gray20")) +
+      scale_fill_discrete(guide=FALSE) +
+      scale_x_discrete(labels=c(label.x, label.y)) +
+      xlab("Condition") + ylab(ylabel) +
+      ggtitle("Core score distributions by condition and stability") +
+      geom_text(data=d[!duplicated(paste0(d$variable, d$type)),], aes(x=variable, y=max(d$value)), vjust=1, position=position_dodge(width=0.9), size=10*5/14) +
+      facet_grid(type~., scales="free")
+  }
 }

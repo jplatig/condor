@@ -54,13 +54,14 @@ condor.compare.qscores <- function(x, y, by=c("column","row","both"),
     d$value <- log(d$value)
   }
   if (plot.type=="violin") {
-    ggplot(d, aes(x=variable, y=value, color=is.stable, label=p), environment=environment()) +
-      geom_violin(position=position_dodge(width=0.8), adjust=0.5) +
-      geom_boxplot(width=0.1, notch=TRUE, outlier.colour=NA, position=position_dodge(width=0.8)) +
-      scale_color_manual(name="", labels=c("Variable", "Stable"), values=c("seagreen4", "gray20")) +
+    ggplot(d, aes(x=variable, y=value, color=is.stable, fill=is.stable, label=p), environment=environment()) +
+      geom_boxplot(width=0.1, notch=TRUE, outlier.colour=NA, position=position_dodge(width=0.8), fill="white") +
+      geom_violin(position=position_dodge(width=0.8), adjust=0.5, alpha=0.3) +
+      scale_color_manual(name="", labels=c("Variable", "Stable"), values=c("seagreen4", "gray20"), guide=FALSE) +
       scale_x_discrete(labels=c(label.x, label.y)) +
+      scale_fill_manual(name="", labels=c("Variable", "Stable"), values=c("seagreen4", "gray20")) +
       xlab("Condition") + ylab(ylabel) +
-      geom_text(data=d[!duplicated(paste0(d$variable, d$type)),], aes(x=variable, y=max(d$value)), vjust=1, position=position_dodge(width=0.9), size=10*5/14) +
+      geom_text(data=d[!duplicated(paste0(d$variable, d$type)),], aes(x=variable, y=max(d$value) + 1), vjust=1, position=position_dodge(width=0.9), size=10*5/14) +
       facet_grid(type~., scales="free")
   } else {
     ggplot(d, aes(x=variable, y=value, fill=is.stable, color=is.stable, label=p), environment=environment()) +

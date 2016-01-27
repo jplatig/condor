@@ -1,4 +1,4 @@
-#' Plots boxplots of core score distributions by condition and by stability for both red and blue nodes
+#' Plots boxplots of core score distributions by condition and by stability for red and/or blue nodes
 #' 
 #' This function tests whether core scores of stable nodes are higher than those of variable nodes
 #' @param x first output of \code{\link{condor.qscore}}
@@ -11,6 +11,7 @@
 #' @param scale.log TRUE/FALSE - If TRUE, plot log core scores
 #' @param nsamp Number of permutation tests to run, passed to \code{\link{condor.core.enrich}}
 #' @param plot.type character string indicating whether to plot violin plots or points
+#' @param node.type character string indicating whether to plot core score comparisons for red nodes, blue nodes, or both
 #' @return ggplot object
 #' @import igraph
 #' @import Matrix
@@ -19,9 +20,11 @@
 condor.compare.qscores <- function(x, y, by=c("column","row","both"),
                                    label.x="Condition x", label.y="Condition y",
                                    red.name="red", blue.name="blue", scale.log=FALSE,
-                                   nsamp=1e4, plot.type=c("violin", "points")) {
+                                   nsamp=1e4, plot.type=c("violin", "points"),
+                                   node.type=c("both","red", "blue")) {
   by <- match.arg(by)
   plot.type <- match.arg(plot.type)
+  node.type <- match.arg(node.type)
   
   ylabel <- ifelse(scale.log, "log(core score)", "Core score")
   qscore.red <- calc.qscore.stability(x, y, type="red", by=by)
@@ -47,9 +50,27 @@ condor.compare.qscores <- function(x, y, by=c("column","row","both"),
     d$type <- ifelse(type=="red", red.name, blue.name)
     return(d)
   }
-  d.red <- perm.test(qscore.red, "red")
-  d.blue <- perm.test(qscore.blue, "blue")
+  
+  d.red <- d.blue <- data.frame()
+  if (sum(qscore.red$is.stable) < nrow(qscore.red)) {
+    if (node.type != "blue") {
+      d.red <- perm.test(qscore.red, "red")  
+    }
+  } else {
+    warning("No reds are assigned to different communities between conditions")
+  }
+  if (sum(qscore.blue$is.stable) < nrow(qscore.blue)) {
+    if (node.type != "red") {
+      d.blue <- perm.test(qscore.blue, "blue")      
+    }
+  } else {
+    warning("No blues are assigned to different communities between conditions")
+  }
   d <- rbind(d.red, d.blue)
+  if (nrow(d)==0) {
+    stop("No reds nor blues are assigned to different communities between conditions. Exiting.")
+  }
+  
   if (scale.log) {
     d$value <- log(d$value)
   }

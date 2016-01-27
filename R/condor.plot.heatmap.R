@@ -22,8 +22,8 @@
 #' condor.object <- create.condor.object(small1976)
 #' condor.object <- condor.cluster(condor.object, project=FALSE)
 #' condor.plot.heatmap(condor.object)
+#' @importFrom grid addGrob getGrob grid.draw
 #' @import ggplot2
-#' @import grid
 #' @import RColorBrewer
 #' @export
 #'  
@@ -191,6 +191,7 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
                                                "geom_rect.rect",
                                                grep=TRUE))
     }
+    plot.new()
     grid.draw(combo.grob)
   } else {
     p

@@ -1,0 +1,143 @@
+---
+title: "condor"
+author: "John Platig"
+date: "`r format(Sys.Date())`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+    fig_width: 7
+    fig_height: 7
+    fig-caption: true
+vignette: >
+  %\VignetteIndexEntry{condor}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  message=FALSE,
+  warning=FALSE
+)
+```
+
+# Introduction
+
+COmplex Network Description Of Regulators (CONDOR) implements methods for clustering bipartite networks and estimating the contribution of each node to its community's modularity. For an application of this method to identify diesease-associated single nucleotide polymorphisms, see [http://arxiv.org/abs/1509.02816](http://arxiv.org/abs/1509.02816).
+
+# Implementing the Bipartite Modularity Maximization
+
+`condor.modularity.max` implements the method described in Michael Barber's paper *Modularity and community detection in bipartite networks* (Phys. Rev. E 76, 066102 (2007)). A few general comments:
+
+* Maximizing bipartite modularity is an NP-hard problem
+* This method is heuristic and can depend on initial assignments of the nodes to communities
+* For the implementation in `condor.cluster`, I use a non-bipartite community detection method from the **igraph** package to use as initial assignments of nodes to communities, which are then used in `condor.modularity.max`.
+* Community structure is designed to cluster networks that form a giant connected component. All of the analysis in this package uses the giant connected component.
+
+# Workflow
+```{r}
+library(condor)
+library(igraph)
+library(ggplot2)
+```
+**condor** works with an edgelist `elist` in the code below) as its input. 
+```{r}
+r = c(1,1,1,2,2,2,3,3,3,4,4);
+b = c(1,2,3,1,2,4,2,3,4,3,4);
+reds <- c("Alice","Sue","Janine","Mary")
+blues <- c("Bob","John","Ed","Hank")
+elist <- data.frame(red=reds[r], blue=blues[b])
+```
+In `elist`, notice all nodes of the same type--women and men in this case--appear in the same column together. This is a requirement. `create.condor.object} will throw an error if a node appears in both columns. 
+```{r}
+condor.object <- create.condor.object(elist)
+```
+`condor.object` is just a list. You can look at the different items using `names`:
+```{r}
+names(condor.object)
+```
+`condor.cluster` will cluster the nodes and produce the overall modularity along with two community membership data.frames:
+```{r, include=FALSE}
+condor.object <- condor.cluster(condor.object)
+```
+```{r}
+print(condor.object$red.memb)
+print(condor.object$blue.memb)
+```
+
+Nodes in first community are {Alice, John, Bob, Sue}, nodes in second community are {Ed, Janine, Hank, Mary} based on the modularity maximization. Here's a picture:
+
+```{r}
+gtoy = graph.edgelist(as.matrix(elist),directed=FALSE)
+set.graph.attribute(gtoy, "layout", layout.kamada.kawai(gtoy))
+V(gtoy)[c(reds,blues)]$color <- c(rep("red",4),rep("blue",4))
+```
+
+```{r}
+plot(gtoy,vertex.label.dist=2)
+```
+
+To get each node's modularity contribution (as a fraction of the community's modularity), run
+```{r include=FALSE}
+condor.object <- condor.qscore(condor.object)
+```
+If you have a subset of nodes that you think are more likely to lie at the cores of your communities, you can test this using `condor.core.enrich`:
+
+```{r}
+q_women <- condor.object$qscores$red.qscore
+core_stats <- suppressWarnings(condor.core.enrich(test_nodes=c("Alice","Mary"),
+                                                  q=q_women,perm=TRUE,plot.hist=TRUE))
+```
+
+**condor** also works on weighted bipartite networks. The package comes with a quantitative pollination network data set (Small 1976) taken from the NCEAS interaction webs data base, containing interactions between 13 plants and 34 pollinators.
+```{r, include=FALSE}
+data(small1976)
+condor.object <- create.condor.object(small1976)
+condor.object <- condor.cluster(condor.object, project=FALSE)
+```
+
+```{r}
+condor.plot.heatmap(condor.object, xlab="Plants", ylab="Pollinators", add.color=TRUE)
+```
+
+Each hue represents a different community and the value represents the edge weight.
+
+We add noise to each edge in the pollination network, simulating a new condition under which the data were taken.
+
+```{r, include=FALSE}
+set.seed(1)
+small1976.noisy <- small1976
+small1976.noisy[, 3] <- small1976[, 3] + floor(runif(nrow(small1976), -5, 5))
+small1976.noisy[which(small1976.noisy[, 3] < 0), 3] <- 0
+condor.object.noisy <- create.condor.object(small1976.noisy)
+condor.object.noisy <- condor.cluster(condor.object.noisy, project=FALSE)
+```
+
+```{r}
+condor.plot.heatmap(condor.object.noisy, xlab="Plants", ylab="Pollinators", add.color=TRUE)
+```
+```{r}
+condor.plot.community.overlap(condor.object, condor.object.noisy) +
+  ylab("Original data-set community") + xlab("Noise-added data-set community")
+```
+
+7 communities instead of 8 are identified in the noise-added data-set. We observe different community assignments a minority of the plants and pollinators.
+
+We compare the core scores of pollinators assigned to the communities in the noise-added condition with the maximum overlap with the original communities (i.e. "stable" pollinators) and those that switch communities (i.e. "variable" pollinators).
+
+```{r include=FALSE}
+condor.object <- condor.qscore(condor.object)
+condor.object.noisy <- condor.qscore(condor.object.noisy)
+```
+
+```{r}
+condor.compare.qscores(condor.object, condor.object.noisy, nsamp=1e3, node.type="red",
+                       label.x="Original data-set", label.y="Noise-added data-set")
+```
+
+Our empirical p-values show that stable pollinators have higher core scores than variable pollinators in the noise-added data-set but not the original data-set.
+
+If you have questions, contact John Platig at [jplatig@jimmy.harvard.edu](jplatig@jimmy.harvard.edu)
+

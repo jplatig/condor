@@ -40,11 +40,11 @@ condor.plot.community.overlap <- function(x, y, type=c("red", "blue"), scale=c("
   d <- melt(overlap.scaled)
   d1 <- melt(overlap)
   d$n <- d1$value
-  d$n[d$n==0] <- NA
+  d$n[d$n==0] <- ""
   p <- ggplot(d, aes(factor(Var2), factor(Var1), fill=value)) +
     geom_tile() +
     # geom_text is in mm = pt * 5/14
-    geom_text(aes(label=round(n, 1)), size=10*5/14) +
+    geom_text(aes(label=n), size=10*5/14) +
     xlab("Condition y community") +
     ylab("Condition x community")
   if (scale!="none") {

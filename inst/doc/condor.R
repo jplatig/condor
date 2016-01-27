@@ -1,81 +1,78 @@
-### R code from vignette source 'CONDOR.Rnw'
+## ---- echo = FALSE-------------------------------------------------------
+knitr::opts_chunk$set(
+  message=FALSE,
+  warning=FALSE
+)
 
-###################################################
-### code chunk number 1: CONDOR.Rnw:31-33
-###################################################
+## ------------------------------------------------------------------------
 library(condor)
 library(igraph)
+library(ggplot2)
 
-
-###################################################
-### code chunk number 2: CONDOR.Rnw:36-41
-###################################################
+## ------------------------------------------------------------------------
 r = c(1,1,1,2,2,2,3,3,3,4,4);
 b = c(1,2,3,1,2,4,2,3,4,3,4);
 reds <- c("Alice","Sue","Janine","Mary")
 blues <- c("Bob","John","Ed","Hank")
 elist <- data.frame(red=reds[r], blue=blues[b])
 
-
-###################################################
-### code chunk number 3: CONDOR.Rnw:44-45
-###################################################
+## ------------------------------------------------------------------------
 condor.object <- create.condor.object(elist)
 
-
-###################################################
-### code chunk number 4: CONDOR.Rnw:48-49
-###################################################
+## ------------------------------------------------------------------------
 names(condor.object)
 
-
-###################################################
-### code chunk number 5: CONDOR.Rnw:52-55
-###################################################
+## ---- include=FALSE------------------------------------------------------
 condor.object <- condor.cluster(condor.object)
+
+## ------------------------------------------------------------------------
 print(condor.object$red.memb)
 print(condor.object$blue.memb)
 
-
-###################################################
-### code chunk number 6: CONDOR.Rnw:59-62
-###################################################
+## ------------------------------------------------------------------------
 gtoy = graph.edgelist(as.matrix(elist),directed=FALSE)
 set.graph.attribute(gtoy, "layout", layout.kamada.kawai(gtoy))
 V(gtoy)[c(reds,blues)]$color <- c(rep("red",4),rep("blue",4))
 
-
-###################################################
-### code chunk number 7: CONDOR.Rnw:65-66
-###################################################
+## ------------------------------------------------------------------------
 plot(gtoy,vertex.label.dist=2)
 
-
-###################################################
-### code chunk number 8: CONDOR.Rnw:70-71
-###################################################
+## ----include=FALSE-------------------------------------------------------
 condor.object <- condor.qscore(condor.object)
 
-
-###################################################
-### code chunk number 9: CONDOR.Rnw:75-78
-###################################################
+## ------------------------------------------------------------------------
 q_women <- condor.object$qscores$red.qscore
 core_stats <- suppressWarnings(condor.core.enrich(test_nodes=c("Alice","Mary"),
                                                   q=q_women,perm=TRUE,plot.hist=TRUE))
 
-
-###################################################
-### code chunk number 10: CONDOR.Rnw:82-85
-###################################################
+## ---- include=FALSE------------------------------------------------------
 data(small1976)
 condor.object <- create.condor.object(small1976)
 condor.object <- condor.cluster(condor.object, project=FALSE)
 
+## ------------------------------------------------------------------------
+condor.plot.heatmap(condor.object, xlab="Plants", ylab="Pollinators", add.color=TRUE)
 
-###################################################
-### code chunk number 11: CONDOR.Rnw:88-89
-###################################################
-condor.plot.heatmap(condor.object, xlab="Plants", ylab="Pollinators", color=TRUE)
+## ---- include=FALSE------------------------------------------------------
+set.seed(1)
+small1976.noisy <- small1976
+small1976.noisy[, 3] <- small1976[, 3] + floor(runif(nrow(small1976), -5, 5))
+small1976.noisy[which(small1976.noisy[, 3] < 0), 3] <- 0
+condor.object.noisy <- create.condor.object(small1976.noisy)
+condor.object.noisy <- condor.cluster(condor.object.noisy, project=FALSE)
 
+## ------------------------------------------------------------------------
+condor.plot.heatmap(condor.object.noisy, xlab="Plants", ylab="Pollinators", add.color=TRUE)
+
+## ------------------------------------------------------------------------
+condor.plot.community.overlap(condor.object, condor.object.noisy) +
+  ylab("Original data-set community") + xlab("Noise-added data-set community")
+
+## ----include=FALSE-------------------------------------------------------
+condor.object <- condor.qscore(condor.object)
+condor.object.noisy <- condor.qscore(condor.object.noisy)
+
+## ------------------------------------------------------------------------
+condor.compare.qscores(condor.object, condor.object.noisy, nsamp=1e3, node.type="red",
+                       label.x="Original data-set", label.y="Noise-added data-set")
 

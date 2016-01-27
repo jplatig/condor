@@ -3,5 +3,10 @@
 *.Rproj
 .DS_Store
 .Rhistory
+.Rprofile
 .RData
 *Rhistory
+packrat/lib*/
+packrat/
+*pdf
+*html

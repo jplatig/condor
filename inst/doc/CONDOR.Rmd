@@ -75,17 +75,17 @@ set.graph.attribute(gtoy, "layout", layout.kamada.kawai(gtoy))
 V(gtoy)[c(reds,blues)]$color <- c(rep("red",4),rep("blue",4))
 ```
 
-```{r}
+```{r, fig.height=4, fig.width=4}
 plot(gtoy,vertex.label.dist=2)
 ```
 
 To get each node's modularity contribution (as a fraction of the community's modularity), run
-```{r results="hide"}
+```{r, results="hide"}
 condor.object <- condor.qscore(condor.object)
 ```
 If you have a subset of nodes that you think are more likely to lie at the cores of your communities, you can test this using `condor.core.enrich`:
 
-```{r}
+```{r, fig.height=4}
 q_women <- condor.object$qscores$red.qscore
 core_stats <- suppressWarnings(condor.core.enrich(test_nodes=c("Alice","Mary"),
                                                   q=q_women,perm=TRUE,plot.hist=TRUE))
@@ -118,12 +118,19 @@ condor.object.noisy <- condor.cluster(condor.object.noisy, project=FALSE)
 ```{r}
 condor.plot.heatmap(condor.object.noisy, xlab="Plants", ylab="Pollinators", add.color=TRUE)
 ```
-```{r}
-condor.plot.community.overlap(condor.object, condor.object.noisy) +
-  ylab("Original data-set community") + xlab("Noise-added data-set community")
+
+We examine the overlaps between community assignments for both plants and pollinators:
+
+```{r fig.height=4, fig.width=4}
+condor.plot.community.overlap(condor.object, condor.object.noisy, type="red") +
+  ylab("Original data-set community") + xlab("Noise-added data-set community") +
+  ggtitle("Community overlaps between pollinators")
+condor.plot.community.overlap(condor.object, condor.object.noisy, type="blue") +
+  ylab("Original data-set community") + xlab("Noise-added data-set community") +
+  ggtitle("Community overlaps between plants")
 ```
 
-7 communities instead of 8 are identified in the noise-added data-set. We observe different community assignments a minority of the plants and pollinators.
+7 communities instead of 8 are identified in the noise-added data-set. We observe a minority of plants and pollinators that are no longer clustered together.
 
 We compare the core scores of pollinators assigned to the communities in the noise-added condition with the maximum overlap with the original communities (i.e. "stable" pollinators) and those that switch communities (i.e. "variable" pollinators).
 
@@ -134,7 +141,7 @@ condor.object.noisy <- condor.qscore(condor.object.noisy)
 
 ```{r}
 condor.compare.qscores(condor.object, condor.object.noisy, nsamp=1e3, node.type="red",
-                       label.x="Original data-set", label.y="Noise-added data-set")
+                       label.x="Original data-set", label.y="Noise-added data-set", notch=FALSE)
 ```
 
 Our empirical p-values show that stable pollinators have higher core scores than variable pollinators in the noise-added data-set but not the original data-set.

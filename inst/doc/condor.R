@@ -34,13 +34,13 @@ gtoy = graph.edgelist(as.matrix(elist),directed=FALSE)
 set.graph.attribute(gtoy, "layout", layout.kamada.kawai(gtoy))
 V(gtoy)[c(reds,blues)]$color <- c(rep("red",4),rep("blue",4))
 
-## ------------------------------------------------------------------------
+## ---- fig.height=4, fig.width=4------------------------------------------
 plot(gtoy,vertex.label.dist=2)
 
-## ----results="hide"------------------------------------------------------
+## ---- results="hide"-----------------------------------------------------
 condor.object <- condor.qscore(condor.object)
 
-## ------------------------------------------------------------------------
+## ---- fig.height=4-------------------------------------------------------
 q_women <- condor.object$qscores$red.qscore
 core_stats <- suppressWarnings(condor.core.enrich(test_nodes=c("Alice","Mary"),
                                                   q=q_women,perm=TRUE,plot.hist=TRUE))
@@ -64,9 +64,13 @@ condor.object.noisy <- condor.cluster(condor.object.noisy, project=FALSE)
 ## ------------------------------------------------------------------------
 condor.plot.heatmap(condor.object.noisy, xlab="Plants", ylab="Pollinators", add.color=TRUE)
 
-## ------------------------------------------------------------------------
-condor.plot.community.overlap(condor.object, condor.object.noisy) +
-  ylab("Original data-set community") + xlab("Noise-added data-set community")
+## ----fig.height=4, fig.width=4-------------------------------------------
+condor.plot.community.overlap(condor.object, condor.object.noisy, type="red") +
+  ylab("Original data-set community") + xlab("Noise-added data-set community") +
+  ggtitle("Community overlaps between pollinators")
+condor.plot.community.overlap(condor.object, condor.object.noisy, type="blue") +
+  ylab("Original data-set community") + xlab("Noise-added data-set community") +
+  ggtitle("Community overlaps between plants")
 
 ## ----results="hide"------------------------------------------------------
 condor.object <- condor.qscore(condor.object)
@@ -74,5 +78,5 @@ condor.object.noisy <- condor.qscore(condor.object.noisy)
 
 ## ------------------------------------------------------------------------
 condor.compare.qscores(condor.object, condor.object.noisy, nsamp=1e3, node.type="red",
-                       label.x="Original data-set", label.y="Noise-added data-set")
+                       label.x="Original data-set", label.y="Noise-added data-set", notch=FALSE)
 

@@ -7,7 +7,8 @@
 condor.compare.qscores(x, y, by = c("column", "row", "both"),
   label.x = "Condition x", label.y = "Condition y", red.name = "red",
   blue.name = "blue", scale.log = FALSE, nsamp = 10000,
-  plot.type = c("violin", "points"), node.type = c("both", "red", "blue"))
+  plot.type = c("violin", "points"), node.type = c("both", "red", "blue"),
+  notch = TRUE)
 }
 \arguments{
 \item{x}{first output of \code{\link{condor.qscore}}}
@@ -31,6 +32,8 @@ condor.compare.qscores(x, y, by = c("column", "row", "both"),
 \item{plot.type}{character string indicating whether to plot violin plots or points}
 
 \item{node.type}{character string indicating whether to plot core score comparisons for red nodes, blue nodes, or both}
+
+\item{notch}{TRUE/FALSE - Add notches to boxplots}
 }
 \value{
 ggplot object

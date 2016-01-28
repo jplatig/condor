@@ -12,6 +12,7 @@
 #' @param nsamp Number of permutation tests to run, passed to \code{\link{condor.core.enrich}}
 #' @param plot.type character string indicating whether to plot violin plots or points
 #' @param node.type character string indicating whether to plot core score comparisons for red nodes, blue nodes, or both
+#' @param notch TRUE/FALSE - Add notches to boxplots
 #' @return ggplot object
 #' @import igraph
 #' @import Matrix
@@ -21,7 +22,7 @@ condor.compare.qscores <- function(x, y, by=c("column","row","both"),
                                    label.x="Condition x", label.y="Condition y",
                                    red.name="red", blue.name="blue", scale.log=FALSE,
                                    nsamp=1e4, plot.type=c("violin", "points"),
-                                   node.type=c("both","red", "blue")) {
+                                   node.type=c("both","red", "blue"), notch=TRUE) {
   by <- match.arg(by)
   plot.type <- match.arg(plot.type)
   node.type <- match.arg(node.type)
@@ -76,7 +77,7 @@ condor.compare.qscores <- function(x, y, by=c("column","row","both"),
   }
   if (plot.type=="violin") {
     ggplot(d, aes(x=variable, y=value, color=is.stable, fill=is.stable, label=p), environment=environment()) +
-      geom_boxplot(width=0.1, notch=TRUE, outlier.colour=NA, position=position_dodge(width=0.8), fill="white") +
+      geom_boxplot(width=0.1, notch=notch, outlier.colour=NA, position=position_dodge(width=0.8), fill="white") +
       geom_violin(position=position_dodge(width=0.8), adjust=0.5, alpha=0.3) +
       scale_color_manual(name="", labels=c("Variable", "Stable"), values=c("seagreen4", "gray20"), guide=FALSE) +
       scale_x_discrete(labels=c(label.x, label.y)) +
@@ -86,7 +87,7 @@ condor.compare.qscores <- function(x, y, by=c("column","row","both"),
       facet_grid(type~., scales="free")
   } else {
     ggplot(d, aes(x=variable, y=value, fill=is.stable, color=is.stable, label=p), environment=environment()) +
-      geom_boxplot(fill="white", outlier.colour=NA, notch=TRUE,
+      geom_boxplot(fill="white", outlier.colour=NA, notch=notch,
                    position=position_dodge(width=0.9)) +
       geom_point(position=position_jitterdodge(dodge.width=0.9), alpha=0.3) +
       scale_color_manual(name="", labels=c("Variable", "Stable"), values=c("seagreen4", "gray20")) +

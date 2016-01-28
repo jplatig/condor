@@ -22,7 +22,7 @@ condor.object <- create.condor.object(elist)
 ## ------------------------------------------------------------------------
 names(condor.object)
 
-## ---- include=FALSE------------------------------------------------------
+## ---- results="hide"-----------------------------------------------------
 condor.object <- condor.cluster(condor.object)
 
 ## ------------------------------------------------------------------------
@@ -37,7 +37,7 @@ V(gtoy)[c(reds,blues)]$color <- c(rep("red",4),rep("blue",4))
 ## ------------------------------------------------------------------------
 plot(gtoy,vertex.label.dist=2)
 
-## ----include=FALSE-------------------------------------------------------
+## ----results="hide"------------------------------------------------------
 condor.object <- condor.qscore(condor.object)
 
 ## ------------------------------------------------------------------------
@@ -45,7 +45,7 @@ q_women <- condor.object$qscores$red.qscore
 core_stats <- suppressWarnings(condor.core.enrich(test_nodes=c("Alice","Mary"),
                                                   q=q_women,perm=TRUE,plot.hist=TRUE))
 
-## ---- include=FALSE------------------------------------------------------
+## ---- results="hide"-----------------------------------------------------
 data(small1976)
 condor.object <- create.condor.object(small1976)
 condor.object <- condor.cluster(condor.object, project=FALSE)
@@ -53,7 +53,7 @@ condor.object <- condor.cluster(condor.object, project=FALSE)
 ## ------------------------------------------------------------------------
 condor.plot.heatmap(condor.object, xlab="Plants", ylab="Pollinators", add.color=TRUE)
 
-## ---- include=FALSE------------------------------------------------------
+## ---- results="hide"-----------------------------------------------------
 set.seed(1)
 small1976.noisy <- small1976
 small1976.noisy[, 3] <- small1976[, 3] + floor(runif(nrow(small1976), -5, 5))
@@ -68,7 +68,7 @@ condor.plot.heatmap(condor.object.noisy, xlab="Plants", ylab="Pollinators", add.
 condor.plot.community.overlap(condor.object, condor.object.noisy) +
   ylab("Original data-set community") + xlab("Noise-added data-set community")
 
-## ----include=FALSE-------------------------------------------------------
+## ----results="hide"------------------------------------------------------
 condor.object <- condor.qscore(condor.object)
 condor.object.noisy <- condor.qscore(condor.object.noisy)
 

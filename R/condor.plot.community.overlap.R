@@ -38,6 +38,7 @@ condor.plot.community.overlap <- function(x, y, type=c("red", "blue"), scale=c("
     overlap.scaled <- t(t(overlap.scaled)/colSums(overlap.scaled))
   }
   d <- melt(overlap.scaled)
+  colnames(d)[1:2] <- c("Var1", "Var2")
   d1 <- melt(overlap)
   d$n <- d1$value
   d$n[d$n==0] <- ""

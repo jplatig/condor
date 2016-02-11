@@ -60,6 +60,7 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
   colsep <- cumsum(as.vector(table(condor.object$blue.memb[,2])))
   ncom <- max(condor.object$blue.memb[,2])
   all.links <- melt(adj)
+  colnames(all.links)[1:2] <- c("Var1", "Var2")
   
   # get axis tick mark locations
   xbreaks <- colnames(adj)[c(1, colsep[-length(colsep)] + 1)]
@@ -161,6 +162,7 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
         m[1, 1] <- max(adj)
       }
       com.links <- melt(m)
+      colnames(com.links)[1:2] <- c("Var1", "Var2")
       p2 <- ggplot() +
         geom_tile(data=com.links, aes(Var2, Var1, fill=value))
       if (ticks=="coms") {

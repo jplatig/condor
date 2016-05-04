@@ -36,10 +36,9 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
   if (is.null(get.edge.attribute(condor.object$G, "weight"))) {
     condor.object$G <- set.edge.attribute(condor.object$G, "weight", value=1)
   }
-  # convert edge lists to adjacency matrices (n reds x m blues)
-  adj <- get.adjacency(condor.object$G, attr="weight", sparse=FALSE)
+  all.links <- cbind(get.edgelist(condor.object$G),get.edge.attribute(condor.object$G,"weight"))
   if (transpose) {
-    adj <- t(adj)
+    all.links <- all.links[,c(2,1,3)]
     tmp <- condor.object$blue.memb
     condor.object$blue.memb <- condor.object$red.memb
     condor.object$red.memb <- tmp
@@ -50,28 +49,33 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
       ylab <- "blues"      
     }
   }
+  
+  all.links <- data.frame(all.links)
+  colnames(all.links) <- c("Var1","Var2","value")
   # reorder reds according to community membership
   reds <- as.character(condor.object$red.memb[order(condor.object$red.memb[,2]),1])
-  adj <- adj[reds,]
   # reorder blues according to community membership
   blues <- as.character(condor.object$blue.memb[order(condor.object$blue.memb[,2]),1])
-  adj <- adj[,blues]
+  
   rowsep <- cumsum(as.vector(table(condor.object$red.memb[,2])))
   colsep <- cumsum(as.vector(table(condor.object$blue.memb[,2])))
   ncom <- max(condor.object$blue.memb[,2])
-  all.links <- melt(adj)
-  colnames(all.links)[1:2] <- c("Var1", "Var2")
+  # reorder by community assignment
+  all.links$Var1 <- factor(all.links$Var1,levels=unique(reds))
+  all.links$Var2 <- factor(all.links$Var2,levels=unique(blues))
+  # change factor to numeric
+  all.links$value <- as.numeric(all.links$value)
   
   # get axis tick mark locations
-  xbreaks <- colnames(adj)[c(1, colsep[-length(colsep)] + 1)]
-  ybreaks <- rownames(adj)[c(1, rowsep[-length(rowsep)] + 1)]
+  xbreaks <- blues[c(1, colsep[-length(colsep)] + 1)]
+  ybreaks <- reds[c(1, rowsep[-length(rowsep)] + 1)]
   if (!transpose) {
     if (is.null(xlabels)) {
       xlabels <- unique(as.character(sort(condor.object$blue.memb[,2])))
       # remove x-axis tick marks that may cause overcrowding
       idx <- which(diff(colsep) < max(colsep) * tick.min.prop)[1]
       if (!is.na(idx)) {
-        xlabels[seq(idx + 2, length(xbreaks), 2)] <- ""  
+        try(xlabels[seq(idx + 2, length(xbreaks), 2)] <- "",silent=TRUE)
       }
     }
     if (is.null(ylabels)) {
@@ -86,7 +90,7 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
           csum <- sum(row.rle$len[1:(idx-1)])
           rm.idx <- c(rm.idx, seq(csum + 2, csum + row.rle$lengths[i] + 1, 2))
         }
-        ylabels[rm.idx] <- ""  
+        ylabels[rm.idx] <- ""
       }
     }
   } else {
@@ -121,7 +125,10 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
   p <- p + xlab(xlab) + 
     ylab(ylab) +
     ggtitle(main) +
-    theme(legend.position=legend.position)
+    theme(legend.position=legend.position,
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.background = element_blank())
   if (ticks=="coms") {
     p <- p + scale_y_discrete(breaks=ybreaks, labels=ylabels) +
       scale_x_discrete(breaks=xbreaks, labels=xlabels)
@@ -138,6 +145,13 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
     p <- p + scale_fill_gradient(name="Edge weight", low="white", high="gray20", na.value="white")
   }
   if (add.color) {
+    adj <- get.adjacency(condor.object$G, attr="weight", sparse=FALSE)
+    if (transpose) {
+      adj <- t(adj)
+    }
+    adj <- adj[reds,]
+    adj <- adj[,blues]
+    
     combo.grob <- ggplotGrob(p)
     # get subset of adj that contains within-community links
     row.idx <- c(1, rowsep[-length(rowsep)] + 1)
@@ -163,6 +177,8 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
       }
       com.links <- melt(m)
       colnames(com.links)[1:2] <- c("Var1", "Var2")
+      com.links$Var1 <- factor(com.links$Var1,levels=unique(com.links$Var1))
+      com.links$Var2 <- factor(com.links$Var2,levels=unique(com.links$Var2))
       p2 <- ggplot() +
         geom_tile(data=com.links, aes(Var2, Var1, fill=value))
       if (ticks=="coms") {

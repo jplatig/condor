@@ -4,11 +4,10 @@
 \alias{condor.compare.qscores}
 \title{Plots boxplots of core score distributions by condition and by stability for red and/or blue nodes}
 \usage{
-condor.compare.qscores(x, y, by = c("column", "row", "both"),
+condor.compare.qscores(x, y, by = c("column", "row", "both"), seed = 8518,
   label.x = "Condition x", label.y = "Condition y", red.name = "red",
-  blue.name = "blue", scale.log = FALSE, nsamp = 10000,
-  plot.type = c("violin", "points"), node.type = c("both", "red", "blue"),
-  notch = TRUE)
+  blue.name = "blue", scale.log = TRUE, nsamp = 10000,
+  node.type = c("both", "red", "blue"), notch = TRUE)
 }
 \arguments{
 \item{x}{first output of \code{\link{condor.qscore}}}
@@ -16,6 +15,8 @@ condor.compare.qscores(x, y, by = c("column", "row", "both"),
 \item{y}{second output of \code{\link{condor.qscore}}}
 
 \item{by}{character string indicating whether to determine stability by 'row', 'column', or 'both'}
+
+\item{seed}{- random seed}
 
 \item{label.x}{Label of first condition}
 
@@ -25,11 +26,9 @@ condor.compare.qscores(x, y, by = c("column", "row", "both"),
 
 \item{blue.name}{Name for blue nodes}
 
-\item{scale.log}{TRUE/FALSE - If TRUE, plot log core scores}
+\item{scale.log}{TRUE/FALSE - If TRUE, plot log10 core scores}
 
 \item{nsamp}{Number of permutation tests to run, passed to \code{\link{condor.core.enrich}}}
-
-\item{plot.type}{character string indicating whether to plot violin plots or points}
 
 \item{node.type}{character string indicating whether to plot core score comparisons for red nodes, blue nodes, or both}
 

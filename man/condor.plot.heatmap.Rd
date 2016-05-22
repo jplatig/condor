@@ -28,7 +28,7 @@ in the network}
 
 \item{main}{a title for the plot}
 
-\item{tick.min.prop}{minimum proportion of genes/TFs a community must contain to have a visible tick mark, used to prevent overlap}
+\item{tick.min.prop}{minimum proportion of genes/TFs a community must contain to have a visible tick mark, used to prevent overlap of axis labels}
 
 \item{xlabels}{optional character vector of length equal to the number of communities to manually mark the x-axis community ticks}
 

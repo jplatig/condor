@@ -11,7 +11,7 @@
 #' @param xlab a title for the x axis
 #' @param ylab a title for the y axis
 #' @param main a title for the plot
-#' @param tick.min.prop minimum proportion of genes/TFs a community must contain to have a visible tick mark, used to prevent overlap
+#' @param tick.min.prop minimum proportion of genes/TFs a community must contain to have a visible tick mark, used to prevent overlap of axis labels
 #' @param xlabels optional character vector of length equal to the number of communities to manually mark the x-axis community ticks
 #' @param ylabels optional character vector of length equal to the number of communities to manually mark the y-axis community ticks
 #' @param legend.position side the legend is placed
@@ -37,19 +37,6 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
     condor.object$G <- set.edge.attribute(condor.object$G, "weight", value=1)
   }
   all.links <- cbind(get.edgelist(condor.object$G),get.edge.attribute(condor.object$G,"weight"))
-  if (transpose) {
-    all.links <- all.links[,c(2,1,3)]
-    tmp <- condor.object$blue.memb
-    condor.object$blue.memb <- condor.object$red.memb
-    condor.object$red.memb <- tmp
-    if (is.null(xlab)) {
-      xlab <- "reds"
-    }
-    if (is.null(ylab)) {
-      ylab <- "blues"      
-    }
-  }
-  
   all.links <- data.frame(all.links)
   colnames(all.links) <- c("Var1","Var2","value")
   # reorder reds according to community membership
@@ -57,8 +44,11 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
   # reorder blues according to community membership
   blues <- as.character(condor.object$blue.memb[order(condor.object$blue.memb[,2]),1])
   
-  rowsep <- cumsum(as.vector(table(condor.object$red.memb[,2])))
-  colsep <- cumsum(as.vector(table(condor.object$blue.memb[,2])))
+  red.sizes <- as.vector(table(condor.object$red.memb[,2]))
+  cum.red.sizes <- cumsum(red.sizes)
+  blue.sizes <- as.vector(table(condor.object$blue.memb[,2]))
+  cum.blue.sizes <- cumsum(blue.sizes)
+
   ncom <- max(condor.object$blue.memb[,2])
   # reorder by community assignment
   all.links$Var1 <- factor(all.links$Var1,levels=unique(reds))
@@ -67,56 +57,40 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
   all.links$value <- as.numeric(all.links$value)
   
   # get axis tick mark locations
-  xbreaks <- blues[c(1, colsep[-length(colsep)] + 1)]
-  ybreaks <- reds[c(1, rowsep[-length(rowsep)] + 1)]
-  if (!transpose) {
-    if (is.null(xlabels)) {
-      xlabels <- unique(as.character(sort(condor.object$blue.memb[,2])))
-      # remove x-axis tick marks that may cause overcrowding
-      idx <- which(diff(colsep) < max(colsep) * tick.min.prop)[1]
-      if (!is.na(idx)) {
-        try(xlabels[seq(idx + 2, length(xbreaks), 2)] <- "",silent=TRUE)
+  xbreaks <- blues[c(1, cum.blue.sizes[-length(cum.blue.sizes)] + 1)]
+  ybreaks <- reds[c(1, cum.red.sizes[-length(cum.red.sizes)] + 1)]
+
+  if (is.null(ylabels)) {
+    ylabels <- unique(as.character(sort(condor.object$red.memb[,2])))
+    # remove y-axis tick marks that may cause overcrowding
+    min.sep <- max(cum.red.sizes) * tick.min.prop
+    last.tick.set <- 1
+    rm.idx <- c()
+    for (i in 1:(length(red.sizes)-1)) {
+      if (sum(red.sizes[last.tick.set:i]) > min.sep) {
+        last.tick.set <- i + 1
+      } else {
+        # remove next tick
+        rm.idx <- c(rm.idx, i + 1)
       }
     }
-    if (is.null(ylabels)) {
-      ylabels <- unique(as.character(sort(condor.object$blue.memb[,2])))
-      # remove y-axis tick marks that may cause overcrowding
-      row.diff <- diff(rowsep)
-      row.rle <- rle(row.diff)
-      idx <- which(row.rle$values < max(rowsep) * tick.min.prop)
-      if (length(idx) > 0) {
-        rm.idx <- c()
-        for(i in idx) {
-          csum <- sum(row.rle$len[1:(idx-1)])
-          rm.idx <- c(rm.idx, seq(csum + 2, csum + row.rle$lengths[i] + 1, 2))
-        }
-        ylabels[rm.idx] <- ""
+    ylabels[rm.idx] <- ""
+  }
+  if (is.null(xlabels)) {
+    xlabels <- unique(as.character(sort(condor.object$blue.memb[,2])))
+    # remove x-axis tick marks that may cause overcrowding
+    min.sep <- max(cum.blue.sizes) * tick.min.prop
+    last.tick.set <- 1
+    rm.idx <- c()
+    for (i in 1:(length(blue.sizes)-1)) {
+      if (sum(blue.sizes[last.tick.set:i]) > min.sep) {
+        last.tick.set <- i + 1
+      } else {
+        # remove next tick
+        rm.idx <- c(rm.idx, i + 1)
       }
     }
-  } else {
-    if (is.null(ylabels)) {
-      ylabels <- unique(as.character(sort(condor.object$blue.memb[,2])))
-      # remove x-axis tick marks that may cause overcrowding
-      idx <- which(diff(rowsep) < max(rowsep) * tick.min.prop)[1]
-      if (!is.na(idx)) {
-        ylabels[seq(idx + 2, length(ybreaks), 2)] <- ""  
-      }
-    }
-    if (is.null(xlabels)) {
-      xlabels <- unique(as.character(sort(condor.object$blue.memb[,2])))
-      # remove y-axis tick marks that may cause overcrowding
-      row.diff <- diff(colsep)
-      row.rle <- rle(row.diff)
-      idx <- which(row.rle$values < max(colsep) * tick.min.prop)
-      if (length(idx) > 0) {
-        rm.idx <- c()
-        for(i in idx) {
-          csum <- sum(row.rle$len[1:(idx-1)])
-          rm.idx <- c(rm.idx, seq(csum + 2, csum + row.rle$lengths[i] + 1, 2))
-        }
-        xlabels[rm.idx] <- ""  
-      }
-    }
+    xlabels[rm.idx] <- ""
   }
   
   p <- ggplot() +
@@ -144,18 +118,18 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
   } else {
     p <- p + scale_fill_gradient(name="Edge weight", low="white", high="gray20", na.value="white")
   }
+  if (transpose) {
+    p <- p + coord_flip()
+  }
   if (add.color) {
     adj <- get.adjacency(condor.object$G, attr="weight", sparse=FALSE)
-    if (transpose) {
-      adj <- t(adj)
-    }
     adj <- adj[reds,]
     adj <- adj[,blues]
     
     combo.grob <- ggplotGrob(p)
     # get subset of adj that contains within-community links
-    row.idx <- c(1, rowsep[-length(rowsep)] + 1)
-    col.idx <- c(1, colsep[-length(colsep)] + 1)
+    row.idx <- c(1, cum.red.sizes[-length(cum.red.sizes)] + 1)
+    col.idx <- c(1, cum.blue.sizes[-length(cum.blue.sizes)] + 1)
     row.indices <- c()
     col.indices <- c()
     
@@ -168,7 +142,7 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
       m <- matrix(0, nrow=nrow(adj), ncol=ncol(adj))
       rownames(m) <- rownames(adj)
       colnames(m) <- colnames(adj)
-      m[row.idx[i]:rowsep[i], col.idx[i]:colsep[i]] <- adj[row.idx[i]:rowsep[i], col.idx[i]:colsep[i]]
+      m[row.idx[i]:cum.red.sizes[i], col.idx[i]:cum.blue.sizes[i]] <- adj[row.idx[i]:cum.red.sizes[i], col.idx[i]:cum.blue.sizes[i]]
       # hack to ensure consistent color scaling
       if (i != ncom) {
         m[nrow(m), ncol(m)] <- max(adj)  
@@ -195,6 +169,9 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
         p2 <- p2 + scale_fill_gradient(name="log10(edge weight)", low="white", high=colors[i], trans="log10", na.value="white")
       } else {
         p2 <- p2 + scale_fill_gradient(name="edge weight", low="white", high=colors[i], na.value="white")
+      }
+      if (transpose) {
+        p2 <- p2 + coord_flip()
       }
       p2g <- ggplotGrob(p2)
       # change white to transparent

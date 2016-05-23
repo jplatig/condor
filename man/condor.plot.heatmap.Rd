@@ -5,9 +5,10 @@
 \title{Plot weighted adjacency matrix with links grouped by community}
 \usage{
 condor.plot.heatmap(condor.object, ticks = c("names", "coms", "none"),
-  add.color = FALSE, colors = NULL, log = FALSE, xlab = "blues",
-  ylab = "reds", main = "", tick.min.prop = 0.05, xlabels = NULL,
-  ylabels = NULL, legend.position = "right", transpose = FALSE)
+  add.color = FALSE, colors = NULL, log = FALSE, blue.name = "blues",
+  red.name = "reds", main = "", tick.min.prop = 0.05,
+  blue.labels = NULL, red.labels = NULL, legend.position = "right",
+  transpose = FALSE)
 }
 \arguments{
 \item{condor.object}{output of either \code{\link{condor.cluster}} or 
@@ -22,17 +23,17 @@ in the network}
 
 \item{log}{if TRUE, transform the color gradient to log-scale.}
 
-\item{xlab}{a title for the x axis}
+\item{blue.name}{a title for the red axis}
 
-\item{ylab}{a title for the y axis}
+\item{red.name}{a title for the blue axis}
 
 \item{main}{a title for the plot}
 
 \item{tick.min.prop}{minimum proportion of genes/TFs a community must contain to have a visible tick mark, used to prevent overlap of axis labels}
 
-\item{xlabels}{optional character vector of length equal to the number of communities to manually mark the x-axis community ticks}
+\item{blue.labels}{optional character vector of length equal to the number of communities to manually mark the blue community ticks}
 
-\item{ylabels}{optional character vector of length equal to the number of communities to manually mark the y-axis community ticks}
+\item{red.labels}{optional character vector of length equal to the number of communities to manually mark the red community ticks}
 
 \item{legend.position}{side the legend is placed}
 

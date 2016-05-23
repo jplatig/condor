@@ -8,12 +8,12 @@
 #' @param colors character vector of colors of length equal to the number of communities
 #' in the network
 #' @param log if TRUE, transform the color gradient to log-scale.
-#' @param xlab a title for the x axis
-#' @param ylab a title for the y axis
+#' @param blue.name a title for the red axis
+#' @param red.name a title for the blue axis
 #' @param main a title for the plot
 #' @param tick.min.prop minimum proportion of genes/TFs a community must contain to have a visible tick mark, used to prevent overlap of axis labels
-#' @param xlabels optional character vector of length equal to the number of communities to manually mark the x-axis community ticks
-#' @param ylabels optional character vector of length equal to the number of communities to manually mark the y-axis community ticks
+#' @param blue.labels optional character vector of length equal to the number of communities to manually mark the blue community ticks
+#' @param red.labels optional character vector of length equal to the number of communities to manually mark the red community ticks
 #' @param legend.position side the legend is placed
 #' @param transpose if TRUE, plot reds in columns rather than rows
 #' @return produces a ggplot object if \code{color} is FALSE, else no return value
@@ -28,8 +28,8 @@
 #' @export
 #'  
 condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), add.color=FALSE,
-                               colors=NULL, log=FALSE, xlab="blues", ylab="reds",
-                               main="", tick.min.prop=0.05, xlabels=NULL, ylabels=NULL,
+                               colors=NULL, log=FALSE, blue.name="blues", red.name="reds",
+                               main="", tick.min.prop=0.05, blue.labels=NULL, red.labels=NULL,
                                legend.position="right", transpose=FALSE){
   ticks <- match.arg(ticks)
   # set edges in unweighted graph to have weight of 1
@@ -69,16 +69,16 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
   p <- ggplot() +
     geom_tile(data=all.links, aes(Var2, Var1, fill=value))
   # plot heatmap
-  p <- p + xlab(xlab) + 
-    ylab(ylab) +
+  p <- p + xlab(blue.name) + 
+    ylab(red.name) +
     ggtitle(main) +
     theme(legend.position=legend.position,
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(),
           panel.background = element_blank())
   if (ticks=="coms") {
-    if (is.null(ylabels)) {
-      ylabels <- unique(as.character(sort(condor.object$red.memb[,2])))
+    if (is.null(red.labels)) {
+      red.labels <- unique(as.character(sort(condor.object$red.memb[,2])))
       # remove y-axis tick marks that may cause overcrowding
       min.sep <- max(cum.red.sizes) * tick.min.prop
       last.tick.set <- 1
@@ -91,10 +91,10 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
           rm.idx <- c(rm.idx, i + 1)
         }
       }
-      ylabels[rm.idx] <- ""
+      red.labels[rm.idx] <- ""
     }
-    if (is.null(xlabels)) {
-      xlabels <- unique(as.character(sort(condor.object$blue.memb[,2])))
+    if (is.null(blue.labels)) {
+      blue.labels <- unique(as.character(sort(condor.object$blue.memb[,2])))
       # remove x-axis tick marks that may cause overcrowding
       min.sep <- max(cum.blue.sizes) * tick.min.prop
       last.tick.set <- 1
@@ -107,10 +107,10 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
           rm.idx <- c(rm.idx, i + 1)
         }
       }
-      xlabels[rm.idx] <- ""
+      blue.labels[rm.idx] <- ""
     }
-    p <- p + scale_y_discrete(breaks=ybreaks, labels=ylabels) +
-      scale_x_discrete(breaks=xbreaks, labels=xlabels)
+    p <- p + scale_y_discrete(breaks=ybreaks, labels=red.labels) +
+      scale_x_discrete(breaks=xbreaks, labels=blue.labels)
   }
   if (ticks=="names") {
     p <- p + theme(axis.text.x=element_text(angle = 45, hjust = 1))
@@ -129,6 +129,12 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
   if (add.color) {
     if (transpose) {
       adj <- t(adj)
+    }
+    if (log) {
+      adj <- log10(adj)
+      adj[adj==-Inf] <- NA
+      # make all numbers positive for plotting purposes
+      adj <- adj - min(adj,na.rm=TRUE)
     }
     
     combo.grob <- ggplotGrob(p)
@@ -154,24 +160,28 @@ condor.plot.heatmap = function(condor.object, ticks=c("names", "coms", "none"), 
     }
     # convert adjacency matrix values to hex colors
     ConvertMatToHex <- function(mat, xs, ys, color) {
-      max.val <- max(mat)
+      max.val <- max(mat,na.rm=TRUE)
       mat <- mat[xs, ys]
+      ConvertColor <- function(x) {
+        tint <- ifelse(is.na(x),"00",toupper(format(as.hexmode(round(x/max.val*255)),2)))
+        paste0(color,tint)
+      }
       if (is.null(dim(mat))) {
-        sapply(mat,function(x){
-          tint <- toupper(format(as.hexmode(round(x/max.val*255)),2))
-          paste0(color,tint)
-        }) 
+        sapply(mat,ConvertColor) 
       } else {
-        apply(mat,2,function(x){
-          tint <- toupper(format(as.hexmode(round(x/max.val*255)),2))
-          paste0(color,tint)
-        })
+        apply(mat,2,ConvertColor)
       }
     }
     for (i in 1:ncom) {
-      xs <- row.idx[i]:cum.red.sizes[i]
-      ys <- col.idx[i]:cum.blue.sizes[i]
-      fills[xs, ys] <- ConvertMatToHex(adj, xs, ys, colors[i])
+      if (transpose) {
+        xs <- row.idx[i]:cum.red.sizes[i]
+        ys <- col.idx[i]:cum.blue.sizes[i]
+        fills[ys, xs] <- ConvertMatToHex(adj, ys, xs, colors[i])
+      } else {
+        xs <- row.idx[i]:cum.red.sizes[i]
+        ys <- col.idx[i]:cum.blue.sizes[i]
+        fills[xs, ys] <- ConvertMatToHex(adj, xs, ys, colors[i])
+      }
     }
     # reorder
     fills <- as.vector(fills)[match(1:nrow(d),d$n)]

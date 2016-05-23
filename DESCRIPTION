@@ -1,8 +1,8 @@
 Package: condor
 Type: Package
 Title: COmplex Network Description Of Regulators
-Version: 1.1.1
-Date: 2016-01-19
+Version: 1.1.2
+Date: 2016-05-23
 Authors@R: c(
     person("John", "Platig", email = "jplatig@jimmy.harvard.edu", role = c("aut")),
     person("Albert", "Young", email = "ayoung@jimmy.harvard.edu", role = c("aut", "cre")))

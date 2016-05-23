@@ -202,8 +202,8 @@ condor.matrix.modularity = function(condor.object,T0=cbind(1:q,rep(1,q)),weights
     colnames(qcom_out) <- c("Qcom","community")
     condor.object$Qcoms = qcom_out
     condor.object$modularity=Qhist
-    condor.object$red.memb=data.frame(red.names=red.names[Rind[,1]],com=Rind[,2])
-    condor.object$blue.memb=data.frame(blue.names=blue.names[Tind[,1]],com=Tind[,2])
+    condor.object$red.memb=data.frame(names=red.names[Rind[,1]],com=Rind[,2])
+    condor.object$blue.memb=data.frame(names=blue.names[Tind[,1]],com=Tind[,2])
     
     return(condor.object)
 }
